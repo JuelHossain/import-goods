@@ -9,10 +9,11 @@ import {
   Link,
   VisuallyHidden,
   chakra,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { FaTwitter, FaYoutube, FaInstagram } from 'react-icons/fa';
 import NextLink from 'next/link';
+import { useAppColorModeValue } from '@/hooks/useAppColorMode';
+import { useCommonColors } from '@/utils/colorModeValues';
 
 const ListHeader = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -33,7 +34,7 @@ const SocialButton = ({
 }) => {
   return (
     <chakra.button
-      bg={useColorModeValue('blackAlpha.100', 'whiteAlpha.100')}
+      bg={useAppColorModeValue('blackAlpha.100', 'whiteAlpha.100')}
       rounded={'full'}
       w={8}
       h={8}
@@ -45,7 +46,7 @@ const SocialButton = ({
       justifyContent={'center'}
       transition={'background 0.3s ease'}
       _hover={{
-        bg: useColorModeValue('blackAlpha.200', 'whiteAlpha.200'),
+        bg: useAppColorModeValue('blackAlpha.200', 'whiteAlpha.200'),
       }}>
       <VisuallyHidden>{label}</VisuallyHidden>
       {children}
@@ -54,10 +55,12 @@ const SocialButton = ({
 };
 
 export default function Footer() {
+  const colors = useCommonColors();
+  
   return (
     <Box
-      bg={useColorModeValue('gray.50', 'gray.900')}
-      color={useColorModeValue('gray.700', 'gray.200')}>
+      bg={colors.bgSecondary}
+      color={colors.textSecondary}>
       <Container as={Stack} maxW={'6xl'} py={10}>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>
           <Stack align={'flex-start'}>
@@ -106,7 +109,7 @@ export default function Footer() {
       <Box
         borderTopWidth={1}
         borderStyle={'solid'}
-        borderColor={useColorModeValue('gray.200', 'gray.700')}>
+        borderColor={colors.borderPrimary}>
         <Container
           as={Stack}
           maxW={'6xl'}
@@ -115,7 +118,7 @@ export default function Footer() {
           spacing={4}
           justify={{ md: 'space-between' }}
           align={{ md: 'center' }}>
-          <Text>© {new Date().getFullYear()} Import Goods. All rights reserved</Text>
+          <Text> {new Date().getFullYear()} Import Goods. All rights reserved</Text>
         </Container>
       </Box>
     </Box>
