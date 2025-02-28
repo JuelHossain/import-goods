@@ -15,25 +15,13 @@ import {
   Card,
   CardBody,
   Stack,
-  Divider,
   Table,
-  TableContainer,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Tabs,
   TabsList,
   TabsTrigger,
   TabsContent,
-  InputGroup,
-  InputElement,
+  Spinner,
+  Center,
 } from '@chakra-ui/react';
 import { useColorMode } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
@@ -180,8 +168,7 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     // Simulate loading and authentication check
@@ -203,23 +190,27 @@ export default function AdminDashboard() {
     setSelectedCategory(e.target.value);
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   const handleApprove = () => {
     // In a real app, you would call an API to approve the order
     console.log('Order approved');
-    setApproveDialogOpen(false);
   };
 
   const handleReject = () => {
     // In a real app, you would call an API to reject the order
     console.log('Order rejected');
-    setRejectDialogOpen(false);
   };
 
   if (isLoading) {
     return (
       <MainLayout>
         <Container maxW="container.xl" py={12}>
-          <Text>Loading...</Text>
+          <Center h="50vh">
+            <Spinner size="xl" color="brand.500" />
+          </Center>
         </Container>
       </MainLayout>
     );
@@ -257,7 +248,7 @@ export default function AdminDashboard() {
         </Heading>
 
         {/* Dashboard Stats */}
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} mb={8}>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} mb={8} spacing={4}>
           {dashboardStats.map((stat, index) => (
             <Card
               key={index}
@@ -305,122 +296,146 @@ export default function AdminDashboard() {
           <TabsContent value="orders">
             {/* Recent Orders Panel */}
             <HStack mb={4}>
-              <InputGroup maxW="300px">
-                <InputElement>
+              <Box position="relative" maxW="300px">
+                <Box position="absolute" left={3} top="50%" transform="translateY(-50%)">
                   <FiSearch color="gray.300" />
-                </InputElement>
-                <Input placeholder="Search orders..." />
-              </InputGroup>
+                </Box>
+                <Input 
+                  pl={10} 
+                  placeholder="Search orders..." 
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </Box>
               
-              <Select 
-                placeholder="Filter by status" 
-                maxW="200px"
-                value={selectedStatus}
-                onChange={handleStatusChange}
-              >
-                <option value="all">All Statuses</option>
-                <option value="completed">Completed</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-              </Select>
+              <Box maxW="200px">
+                <select 
+                  value={selectedStatus}
+                  onChange={handleStatusChange}
+                  style={{ 
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: '1px solid',
+                    borderColor: colorMode === 'dark' ? '#4A5568' : '#E2E8F0',
+                    backgroundColor: colorMode === 'dark' ? '#2D3748' : 'white',
+                    color: colorMode === 'dark' ? 'white' : 'black',
+                    width: '100%'
+                  }}
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="completed">Completed</option>
+                  <option value="processing">Processing</option>
+                  <option value="shipped">Shipped</option>
+                </select>
+              </Box>
             </HStack>
 
             <Box overflowX="auto">
-              <TableContainer>
-                <Table>
-                  <Thead>
-                    <Tr>
-                      <Th>Order ID</Th>
-                      <Th>Customer</Th>
-                      <Th>Date</Th>
-                      <Th>Amount</Th>
-                      <Th>Status</Th>
-                      <Th>Actions</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {recentOrders
-                      .filter(
-                        order =>
-                          selectedStatus === 'all' ||
-                          order.status.toLowerCase() === selectedStatus
-                      )
-                      .map(order => (
-                        <Tr key={order.id}>
-                          <Td>{order.id}</Td>
-                          <Td>{order.customer}</Td>
-                          <Td>{order.date}</Td>
-                          <Td>{order.amount}</Td>
-                          <Td>
-                            <Badge
-                              colorScheme={
-                                order.status === 'Completed'
-                                  ? 'green'
-                                  : order.status === 'Processing'
-                                  ? 'yellow'
-                                  : 'blue'
-                              }
+              <Box as="table" width="100%" borderCollapse="collapse">
+                <Box as="thead">
+                  <Box as="tr">
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Order ID</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Customer</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Date</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Amount</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Status</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Actions</Box>
+                  </Box>
+                </Box>
+                <Box as="tbody">
+                  {recentOrders
+                    .filter(
+                      order =>
+                        (selectedStatus === 'all' ||
+                        order.status.toLowerCase() === selectedStatus) &&
+                        (searchQuery === '' ||
+                        order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        order.customer.toLowerCase().includes(searchQuery.toLowerCase()))
+                    )
+                    .map(order => (
+                      <Box as="tr" key={order.id}>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{order.id}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{order.customer}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{order.date}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{order.amount}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>
+                          <Badge
+                            colorScheme={
+                              order.status === 'Completed'
+                                ? 'green'
+                                : order.status === 'Processing'
+                                ? 'yellow'
+                                : 'blue'
+                            }
+                          >
+                            {order.status}
+                          </Badge>
+                        </Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>
+                          <HStack>
+                            <Button
+                              size="sm"
+                              colorScheme="blue"
+                              onClick={() => router.push(`/admin/orders/${order.id}`)}
                             >
-                              {order.status}
-                            </Badge>
-                          </Td>
-                          <Td>
-                            <HStack>
-                              <Button
-                                size="sm"
-                                colorScheme="blue"
-                                onClick={() => router.push(`/admin/orders/${order.id}`)}
-                              >
-                                View
-                              </Button>
-                            </HStack>
-                          </Td>
-                        </Tr>
-                      ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+                              View
+                            </Button>
+                          </HStack>
+                        </Box>
+                      </Box>
+                    ))}
+                </Box>
+              </Box>
             </Box>
           </TabsContent>
 
           <TabsContent value="preorders">
             {/* Pre-Orders Panel */}
             <HStack mb={4}>
-              <InputGroup maxW="300px">
-                <InputElement>
+              <Box position="relative" maxW="300px">
+                <Box position="absolute" left={3} top="50%" transform="translateY(-50%)">
                   <FiSearch color="gray.300" />
-                </InputElement>
-                <Input placeholder="Search pre-orders..." />
-              </InputGroup>
+                </Box>
+                <Input 
+                  pl={10} 
+                  placeholder="Search pre-orders..." 
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </Box>
             </HStack>
 
             <Box overflowX="auto">
-              <TableContainer>
-                <Table>
-                  <Thead>
-                    <Tr>
-                      <Th>Pre-Order ID</Th>
-                      <Th>Customer</Th>
-                      <Th>Date</Th>
-                      <Th>Amount</Th>
-                      <Th>Est. Shipping</Th>
-                      <Th>Actions</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {preOrders.map(order => (
-                      <Tr key={order.id}>
-                        <Td>{order.id}</Td>
-                        <Td>{order.customer}</Td>
-                        <Td>{order.date}</Td>
-                        <Td>{order.amount}</Td>
-                        <Td>{order.estimatedShipping}</Td>
-                        <Td>
+              <Box as="table" width="100%" borderCollapse="collapse">
+                <Box as="thead">
+                  <Box as="tr">
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Pre-Order ID</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Customer</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Date</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Amount</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Est. Shipping</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Actions</Box>
+                  </Box>
+                </Box>
+                <Box as="tbody">
+                  {preOrders
+                    .filter(order => 
+                      searchQuery === '' ||
+                      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      order.customer.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map(order => (
+                      <Box as="tr" key={order.id}>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{order.id}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{order.customer}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{order.date}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{order.amount}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{order.estimatedShipping}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>
                           <HStack>
                             <Button
                               size="sm"
                               colorScheme="green"
-                              disabled={false}
                               onClick={handleApprove}
                             >
                               Approve
@@ -428,89 +443,102 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               colorScheme="red"
-                              disabled={false}
                               onClick={handleReject}
                             >
                               Reject
                             </Button>
                           </HStack>
-                        </Td>
-                      </Tr>
+                        </Box>
+                      </Box>
                     ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+                </Box>
+              </Box>
             </Box>
           </TabsContent>
 
           <TabsContent value="products">
             {/* Products Panel */}
             <HStack mb={4}>
-              <InputGroup maxW="300px">
-                <InputElement>
+              <Box position="relative" maxW="300px">
+                <Box position="absolute" left={3} top="50%" transform="translateY(-50%)">
                   <FiSearch color="gray.300" />
-                </InputElement>
-                <Input placeholder="Search products..." />
-              </InputGroup>
+                </Box>
+                <Input 
+                  pl={10} 
+                  placeholder="Search products..." 
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </Box>
               
-              <Select 
-                placeholder="Filter by category" 
-                maxW="200px"
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-              >
-                <option value="all">All Categories</option>
-                <option value="fashion">Fashion</option>
-                <option value="food & beverage">Food & Beverage</option>
-                <option value="home decor">Home Decor</option>
-              </Select>
+              <Box maxW="200px">
+                <select 
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                  style={{ 
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: '1px solid',
+                    borderColor: colorMode === 'dark' ? '#4A5568' : '#E2E8F0',
+                    backgroundColor: colorMode === 'dark' ? '#2D3748' : 'white',
+                    color: colorMode === 'dark' ? 'white' : 'black',
+                    width: '100%'
+                  }}
+                >
+                  <option value="all">All Categories</option>
+                  <option value="fashion">Fashion</option>
+                  <option value="food & beverage">Food & Beverage</option>
+                  <option value="home decor">Home Decor</option>
+                </select>
+              </Box>
             </HStack>
 
             <Box overflowX="auto">
-              <TableContainer>
-                <Table>
-                  <Thead>
-                    <Tr>
-                      <Th>Product ID</Th>
-                      <Th>Name</Th>
-                      <Th>Category</Th>
-                      <Th>Price</Th>
-                      <Th>Stock</Th>
-                      <Th>Origin</Th>
-                      <Th>Actions</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {products
-                      .filter(
-                        product =>
-                          selectedCategory === 'all' ||
-                          product.category.toLowerCase() === selectedCategory
-                      )
-                      .map(product => (
-                        <Tr key={product.id}>
-                          <Td>{product.id}</Td>
-                          <Td>{product.name}</Td>
-                          <Td>{product.category}</Td>
-                          <Td>{product.price}</Td>
-                          <Td>{product.stock}</Td>
-                          <Td>{product.origin}</Td>
-                          <Td>
-                            <HStack>
-                              <Button
-                                size="sm"
-                                colorScheme="blue"
-                                onClick={() => router.push(`/admin/products/${product.id}`)}
-                              >
-                                Edit
-                              </Button>
-                            </HStack>
-                          </Td>
-                        </Tr>
-                      ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+              <Box as="table" width="100%" borderCollapse="collapse">
+                <Box as="thead">
+                  <Box as="tr">
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Product ID</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Name</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Category</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Price</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Stock</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Origin</Box>
+                    <Box as="th" textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>Actions</Box>
+                  </Box>
+                </Box>
+                <Box as="tbody">
+                  {products
+                    .filter(
+                      product =>
+                        (selectedCategory === 'all' ||
+                        product.category.toLowerCase() === selectedCategory) &&
+                        (searchQuery === '' ||
+                        product.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        product.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                    )
+                    .map(product => (
+                      <Box as="tr" key={product.id}>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{product.id}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{product.name}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{product.category}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{product.price}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{product.stock}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>{product.origin}</Box>
+                        <Box as="td" py={3} px={4} borderBottom="1px solid" borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}>
+                          <HStack>
+                            <Button
+                              size="sm"
+                              colorScheme="blue"
+                              onClick={() => router.push(`/admin/products/${product.id}`)}
+                            >
+                              Edit
+                            </Button>
+                          </HStack>
+                        </Box>
+                      </Box>
+                    ))}
+                </Box>
+              </Box>
             </Box>
           </TabsContent>
 
