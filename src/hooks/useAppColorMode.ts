@@ -1,3 +1,5 @@
+'use client';
+
 import { useColorMode as useChakraColorMode, useColorModeValue as useChakraColorModeValue } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 
@@ -30,13 +32,13 @@ const detectSystemColorMode = (): ColorMode => {
  * when Chakra UI's useColorMode is not available
  */
 export function useAppColorMode(): ColorModeReturn {
-  const [colorMode, setColorMode] = useState<ColorMode>('light');
+  const [localColorMode, setLocalColorMode] = useState<ColorMode>('light');
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     try {
       // Check system preference for dark mode on initial load
-      setColorMode(detectSystemColorMode());
+      setLocalColorMode(detectSystemColorMode());
       setIsReady(true);
     } catch (error) {
       console.warn('Error detecting system color mode preference:', error);
@@ -46,11 +48,11 @@ export function useAppColorMode(): ColorModeReturn {
 
   // Try to use Chakra's useColorMode, fall back to our state if it fails
   try {
-    const { colorMode: chakraColorMode, toggleColorMode: chakraToggleColorMode } = useChakraColorMode();
+    const { colorMode, toggleColorMode } = useChakraColorMode();
     
     return {
-      colorMode: chakraColorMode as ColorMode,
-      toggleColorMode: chakraToggleColorMode,
+      colorMode: colorMode as ColorMode,
+      toggleColorMode,
       isReady: true
     };
   } catch (error) {
@@ -58,11 +60,11 @@ export function useAppColorMode(): ColorModeReturn {
     console.warn('Chakra useColorMode not available, using fallback implementation');
     
     const toggleColorMode = () => {
-      setColorMode(prev => (prev === 'light' ? 'dark' : 'light'));
+      setLocalColorMode(prev => (prev === 'light' ? 'dark' : 'light'));
     };
 
     return {
-      colorMode,
+      colorMode: localColorMode,
       toggleColorMode,
       isReady
     };

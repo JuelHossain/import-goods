@@ -4,7 +4,6 @@ import {
   Box,
   SimpleGrid,
   Flex,
-  Stat,
   StatLabel,
   StatNumber,
   StatHelpText,

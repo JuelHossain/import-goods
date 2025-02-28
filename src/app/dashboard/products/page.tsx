@@ -22,7 +22,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { SearchIcon, AddIcon, ChevronDownIcon } from '@chakra-ui/icons';
-import { FiFilter, FiGrid, FiList } from 'react-icons/fi';
+import { FiGrid, FiList } from 'react-icons/fi';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, Container, Badge, Table, Modal } from '@/components/common';
 import { useCommonColors } from '@/utils/colorModeValues';
@@ -142,10 +142,10 @@ export default function ProductsDashboard() {
     {
       header: 'Product',
       accessor: 'name',
-      cell: (value: string, item: any) => (
+      cell: (value: string, item: Record<string, unknown>) => (
         <HStack spacing={3}>
           <Image
-            src={item.image}
+            src={item.image as string}
             alt={value}
             boxSize="40px"
             objectFit="cover"
@@ -175,12 +175,12 @@ export default function ProductsDashboard() {
     {
       header: 'Status',
       accessor: 'status',
-      cell: (value: string, item: any) => getStatusBadge(value, item.stock),
+      cell: (value: string, item: Record<string, unknown>) => getStatusBadge(value, item.stock as number),
     },
     {
       header: 'Actions',
       accessor: 'id',
-      cell: (value: string) => (
+      cell: (_: string) => (
         <HStack spacing={2}>
           <Button size="sm" variant="ghost">Edit</Button>
           <Button size="sm" variant="ghost" colorScheme="red">Delete</Button>
