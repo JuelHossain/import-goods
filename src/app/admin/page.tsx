@@ -7,37 +7,35 @@ import {
   Heading,
   Text,
   SimpleGrid,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatArrow,
   Icon,
+  Button,
+  Badge,
+  HStack,
+  Input,
+  Card,
+  CardBody,
+  Stack,
+  Divider,
   Table,
+  TableContainer,
   Thead,
   Tbody,
   Tr,
   Th,
   Td,
-  Button,
-  Badge,
-  useColorModeValue,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  HStack,
   Select,
-  Input,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
   InputGroup,
-  InputLeftElement,
-  Card,
-  CardBody,
-  Stack,
-  Divider,
-  useToast,
+  InputElement,
 } from '@chakra-ui/react';
+import { useColorMode } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { FiUsers, FiShoppingBag, FiDollarSign, FiActivity, FiSearch } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
@@ -54,146 +52,167 @@ const dashboardStats = [
   },
   {
     label: 'Total Orders',
-    value: 842,
-    change: 8.2,
+    value: 4587,
+    change: 23.1,
     icon: FiShoppingBag,
     color: 'green.500',
   },
   {
-    label: 'Revenue',
-    value: '$156,432',
-    change: 23.1,
+    label: 'Total Revenue',
+    value: '$89,421',
+    change: 7.4,
     icon: FiDollarSign,
     color: 'purple.500',
   },
   {
-    label: 'Pre-Orders',
-    value: 54,
-    change: -4.3,
+    label: 'Growth Rate',
+    value: '24.8%',
+    change: -2.3,
     icon: FiActivity,
     color: 'orange.500',
   },
 ];
 
-// Mock recent orders
+// Mock data for recent orders
 const recentOrders = [
   {
     id: 'ORD-001',
     customer: 'John Smith',
     date: '2023-05-15',
-    amount: '$299.00',
+    amount: '$245.99',
     status: 'Completed',
   },
   {
     id: 'ORD-002',
     customer: 'Sarah Johnson',
     date: '2023-05-14',
-    amount: '$189.00',
+    amount: '$189.50',
     status: 'Processing',
   },
   {
     id: 'ORD-003',
     customer: 'Michael Brown',
     date: '2023-05-14',
-    amount: '$49.00',
-    status: 'Completed',
+    amount: '$532.20',
+    status: 'Shipped',
   },
   {
     id: 'ORD-004',
     customer: 'Emily Davis',
     date: '2023-05-13',
-    amount: '$599.00',
-    status: 'Shipped',
+    amount: '$76.00',
+    status: 'Completed',
   },
   {
     id: 'ORD-005',
     customer: 'David Wilson',
     date: '2023-05-12',
-    amount: '$79.00',
-    status: 'Completed',
+    amount: '$124.30',
+    status: 'Processing',
   },
 ];
 
-// Mock pre-orders
+// Mock data for pre-orders
 const preOrders = [
   {
     id: 'PRE-001',
-    customer: 'Alex Johnson',
-    date: '2023-05-15',
-    productLink: 'https://example-merchant.com/product/123',
-    status: 'Pending',
+    customer: 'Alice Williams',
+    date: '2023-05-10',
+    amount: '$349.99',
+    estimatedShipping: '2023-06-15',
   },
   {
     id: 'PRE-002',
-    customer: 'Jessica Williams',
-    date: '2023-05-14',
-    productLink: 'https://another-merchant.com/item/456',
-    status: 'Approved',
+    customer: 'Robert Jones',
+    date: '2023-05-09',
+    amount: '$189.50',
+    estimatedShipping: '2023-06-20',
   },
   {
     id: 'PRE-003',
-    customer: 'Robert Miller',
-    date: '2023-05-13',
-    productLink: 'https://luxury-items.com/watch/789',
-    status: 'Processing',
+    customer: 'Jennifer Miller',
+    date: '2023-05-08',
+    amount: '$432.20',
+    estimatedShipping: '2023-06-10',
+  },
+];
+
+// Mock data for products
+const products = [
+  {
+    id: 'PROD-001',
+    name: 'Handcrafted Leather Bag',
+    category: 'Fashion',
+    price: '$299.99',
+    stock: 24,
+    origin: 'Italy',
   },
   {
-    id: 'PRE-004',
-    customer: 'Lisa Brown',
-    date: '2023-05-12',
-    productLink: 'https://artisan-goods.com/ceramics/101',
-    status: 'Pending',
+    id: 'PROD-002',
+    name: 'Premium Coffee Beans',
+    category: 'Food & Beverage',
+    price: '$49.99',
+    stock: 156,
+    origin: 'Colombia',
   },
   {
-    id: 'PRE-005',
-    customer: 'Daniel Taylor',
-    date: '2023-05-11',
-    productLink: 'https://global-market.com/textiles/202',
-    status: 'Rejected',
+    id: 'PROD-003',
+    name: 'Artisanal Ceramic Vase',
+    category: 'Home Decor',
+    price: '$89.99',
+    stock: 42,
+    origin: 'Portugal',
+  },
+  {
+    id: 'PROD-004',
+    name: 'Organic Olive Oil',
+    category: 'Food & Beverage',
+    price: '$24.99',
+    stock: 78,
+    origin: 'Greece',
   },
 ];
 
 export default function AdminDashboard() {
+  const { colorMode } = useColorMode();
   const router = useRouter();
-  const toast = useToast();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
 
-  // In a real app, you would check if the user is authenticated and has admin privileges
   useEffect(() => {
+    // Simulate loading and authentication check
     const checkAuth = async () => {
-      // Simulate authentication check
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, we'll just set this to true
-      // In a real app, you would check with your auth provider
+      // In a real app, you would check if the user is authenticated and has admin role
       setIsAuthenticated(true);
       setIsLoading(false);
     };
-    
+
     checkAuth();
   }, []);
 
-  // Handle order status change
-  const handleStatusChange = (orderId: string, newStatus: string) => {
-    toast({
-      title: 'Status updated',
-      description: `Order ${orderId} status changed to ${newStatus}`,
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedStatus(e.target.value);
   };
 
-  // Handle pre-order approval or rejection
-  const handlePreOrderAction = (preOrderId: string, action: 'approve' | 'reject') => {
-    toast({
-      title: action === 'approve' ? 'Pre-order approved' : 'Pre-order rejected',
-      description: `Pre-order ${preOrderId} has been ${action === 'approve' ? 'approved' : 'rejected'}`,
-      status: action === 'approve' ? 'success' : 'info',
-      duration: 3000,
-      isClosable: true,
-    });
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+  };
+
+  const handleApprove = () => {
+    // In a real app, you would call an API to approve the order
+    console.log('Order approved');
+    setApproveDialogOpen(false);
+  };
+
+  const handleReject = () => {
+    // In a real app, you would call an API to reject the order
+    console.log('Order rejected');
+    setRejectDialogOpen(false);
   };
 
   if (isLoading) {
@@ -213,7 +232,7 @@ export default function AdminDashboard() {
         <Container maxW="container.xl" py={12}>
           <Card>
             <CardBody>
-              <Stack spacing={4} align="center">
+              <Stack align="center">
                 <Heading size="lg">Admin Access Required</Heading>
                 <Text>You need to be logged in as an administrator to view this page.</Text>
                 <Button
@@ -238,67 +257,77 @@ export default function AdminDashboard() {
         </Heading>
 
         {/* Dashboard Stats */}
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} mb={8}>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} mb={8}>
           {dashboardStats.map((stat, index) => (
-            <Stat
+            <Card
               key={index}
               px={6}
               py={4}
-              bg={useColorModeValue('white', 'gray.700')}
+              bg={colorMode === 'dark' ? 'gray.700' : 'white'}
               shadow="md"
               rounded="lg"
             >
-              <Flex justifyContent="space-between">
-                <Box>
-                  <StatLabel fontWeight="medium">{stat.label}</StatLabel>
-                  <StatNumber fontSize="2xl" fontWeight="bold">
-                    {stat.value}
-                  </StatNumber>
-                  <StatHelpText>
-                    <StatArrow type={stat.change > 0 ? 'increase' : 'decrease'} />
-                    {Math.abs(stat.change)}% since last month
-                  </StatHelpText>
-                </Box>
-                <Box
-                  my="auto"
-                  color={stat.color}
-                  alignContent="center"
-                >
-                  <Icon as={stat.icon} w={8} h={8} />
-                </Box>
-              </Flex>
-            </Stat>
+              <CardBody p={0}>
+                <Flex justifyContent="space-between">
+                  <Box>
+                    <Text fontWeight="medium">{stat.label}</Text>
+                    <Text fontSize="2xl" fontWeight="bold">
+                      {stat.value}
+                    </Text>
+                    <Text>
+                      <Box as="span" color={stat.change > 0 ? 'green.500' : 'red.500'}>
+                        {stat.change > 0 ? '↑' : '↓'} {Math.abs(stat.change)}%
+                      </Box>
+                      {' '}since last month
+                    </Text>
+                  </Box>
+                  <Box
+                    my="auto"
+                    color={stat.color}
+                    alignContent="center"
+                  >
+                    <Icon as={stat.icon} w={8} h={8} />
+                  </Box>
+                </Flex>
+              </CardBody>
+            </Card>
           ))}
         </SimpleGrid>
 
-        <Tabs colorScheme="brand" variant="enclosed">
-          <TabList>
-            <Tab>Recent Orders</Tab>
-            <Tab>Pre-Orders</Tab>
-            <Tab>Products</Tab>
-            <Tab>Customers</Tab>
-          </TabList>
+        <Tabs>
+          <TabsList>
+            <TabsTrigger value="orders">Recent Orders</TabsTrigger>
+            <TabsTrigger value="preorders">Pre-Orders</TabsTrigger>
+            <TabsTrigger value="products">Products</TabsTrigger>
+            <TabsTrigger value="customers">Customers</TabsTrigger>
+          </TabsList>
 
-          <TabPanels>
+          <TabsContent value="orders">
             {/* Recent Orders Panel */}
-            <TabPanel>
-              <HStack spacing={4} mb={4}>
-                <InputGroup maxW="300px">
-                  <InputLeftElement pointerEvents="none">
-                    <FiSearch color="gray.300" />
-                  </InputLeftElement>
-                  <Input placeholder="Search orders..." />
-                </InputGroup>
-                <Select placeholder="Filter by status" maxW="200px">
-                  <option value="all">All Statuses</option>
-                  <option value="completed">Completed</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                </Select>
-              </HStack>
+            <HStack mb={4}>
+              <InputGroup maxW="300px">
+                <InputElement>
+                  <FiSearch color="gray.300" />
+                </InputElement>
+                <Input placeholder="Search orders..." />
+              </InputGroup>
+              
+              <Select 
+                placeholder="Filter by status" 
+                maxW="200px"
+                value={selectedStatus}
+                onChange={handleStatusChange}
+              >
+                <option value="all">All Statuses</option>
+                <option value="completed">Completed</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+              </Select>
+            </HStack>
 
-              <Box overflowX="auto">
-                <Table variant="simple">
+            <Box overflowX="auto">
+              <TableContainer>
+                <Table>
                   <Thead>
                     <Tr>
                       <Th>Order ID</Th>
@@ -310,132 +339,99 @@ export default function AdminDashboard() {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {recentOrders.map((order) => (
-                      <Tr key={order.id}>
-                        <Td>{order.id}</Td>
-                        <Td>{order.customer}</Td>
-                        <Td>{order.date}</Td>
-                        <Td>{order.amount}</Td>
-                        <Td>
-                          <Badge
-                            colorScheme={
-                              order.status === 'Completed'
-                                ? 'green'
-                                : order.status === 'Processing'
-                                ? 'yellow'
-                                : 'blue'
-                            }
-                          >
-                            {order.status}
-                          </Badge>
-                        </Td>
-                        <Td>
-                          <HStack spacing={2}>
-                            <Select
-                              size="sm"
-                              defaultValue={order.status.toLowerCase()}
-                              onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                              width="140px"
+                    {recentOrders
+                      .filter(
+                        order =>
+                          selectedStatus === 'all' ||
+                          order.status.toLowerCase() === selectedStatus
+                      )
+                      .map(order => (
+                        <Tr key={order.id}>
+                          <Td>{order.id}</Td>
+                          <Td>{order.customer}</Td>
+                          <Td>{order.date}</Td>
+                          <Td>{order.amount}</Td>
+                          <Td>
+                            <Badge
+                              colorScheme={
+                                order.status === 'Completed'
+                                  ? 'green'
+                                  : order.status === 'Processing'
+                                  ? 'yellow'
+                                  : 'blue'
+                              }
                             >
-                              <option value="pending">Pending</option>
-                              <option value="processing">Processing</option>
-                              <option value="shipped">Shipped</option>
-                              <option value="completed">Completed</option>
-                              <option value="cancelled">Cancelled</option>
-                            </Select>
-                            <Button size="sm" colorScheme="brand">
-                              View
-                            </Button>
-                          </HStack>
-                        </Td>
-                      </Tr>
-                    ))}
+                              {order.status}
+                            </Badge>
+                          </Td>
+                          <Td>
+                            <HStack>
+                              <Button
+                                size="sm"
+                                colorScheme="blue"
+                                onClick={() => router.push(`/admin/orders/${order.id}`)}
+                              >
+                                View
+                              </Button>
+                            </HStack>
+                          </Td>
+                        </Tr>
+                      ))}
                   </Tbody>
                 </Table>
-              </Box>
-            </TabPanel>
+              </TableContainer>
+            </Box>
+          </TabsContent>
 
+          <TabsContent value="preorders">
             {/* Pre-Orders Panel */}
-            <TabPanel>
-              <HStack spacing={4} mb={4}>
-                <InputGroup maxW="300px">
-                  <InputLeftElement pointerEvents="none">
-                    <FiSearch color="gray.300" />
-                  </InputLeftElement>
-                  <Input placeholder="Search pre-orders..." />
-                </InputGroup>
-                <Select placeholder="Filter by status" maxW="200px">
-                  <option value="all">All Statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="processing">Processing</option>
-                  <option value="rejected">Rejected</option>
-                </Select>
-              </HStack>
+            <HStack mb={4}>
+              <InputGroup maxW="300px">
+                <InputElement>
+                  <FiSearch color="gray.300" />
+                </InputElement>
+                <Input placeholder="Search pre-orders..." />
+              </InputGroup>
+            </HStack>
 
-              <Box overflowX="auto">
-                <Table variant="simple">
+            <Box overflowX="auto">
+              <TableContainer>
+                <Table>
                   <Thead>
                     <Tr>
                       <Th>Pre-Order ID</Th>
                       <Th>Customer</Th>
                       <Th>Date</Th>
-                      <Th>Product Link</Th>
-                      <Th>Status</Th>
+                      <Th>Amount</Th>
+                      <Th>Est. Shipping</Th>
                       <Th>Actions</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {preOrders.map((preOrder) => (
-                      <Tr key={preOrder.id}>
-                        <Td>{preOrder.id}</Td>
-                        <Td>{preOrder.customer}</Td>
-                        <Td>{preOrder.date}</Td>
+                    {preOrders.map(order => (
+                      <Tr key={order.id}>
+                        <Td>{order.id}</Td>
+                        <Td>{order.customer}</Td>
+                        <Td>{order.date}</Td>
+                        <Td>{order.amount}</Td>
+                        <Td>{order.estimatedShipping}</Td>
                         <Td>
-                          <Text
-                            maxW="200px"
-                            overflow="hidden"
-                            textOverflow="ellipsis"
-                            whiteSpace="nowrap"
-                          >
-                            {preOrder.productLink}
-                          </Text>
-                        </Td>
-                        <Td>
-                          <Badge
-                            colorScheme={
-                              preOrder.status === 'Approved'
-                                ? 'green'
-                                : preOrder.status === 'Rejected'
-                                ? 'red'
-                                : preOrder.status === 'Processing'
-                                ? 'blue'
-                                : 'yellow'
-                            }
-                          >
-                            {preOrder.status}
-                          </Badge>
-                        </Td>
-                        <Td>
-                          <HStack spacing={2}>
+                          <HStack>
                             <Button
                               size="sm"
                               colorScheme="green"
-                              isDisabled={preOrder.status === 'Approved' || preOrder.status === 'Rejected'}
-                              onClick={() => handlePreOrderAction(preOrder.id, 'approve')}
+                              disabled={false}
+                              onClick={handleApprove}
                             >
                               Approve
                             </Button>
                             <Button
                               size="sm"
                               colorScheme="red"
-                              isDisabled={preOrder.status === 'Approved' || preOrder.status === 'Rejected'}
-                              onClick={() => handlePreOrderAction(preOrder.id, 'reject')}
+                              disabled={false}
+                              onClick={handleReject}
                             >
                               Reject
-                            </Button>
-                            <Button size="sm" colorScheme="brand">
-                              View
                             </Button>
                           </HStack>
                         </Td>
@@ -443,25 +439,85 @@ export default function AdminDashboard() {
                     ))}
                   </Tbody>
                 </Table>
-              </Box>
-            </TabPanel>
+              </TableContainer>
+            </Box>
+          </TabsContent>
 
+          <TabsContent value="products">
             {/* Products Panel */}
-            <TabPanel>
-              <Text fontSize="lg" mb={4}>
-                Products management functionality will be implemented in the next phase.
-              </Text>
-              <Button colorScheme="brand">Add New Product</Button>
-            </TabPanel>
+            <HStack mb={4}>
+              <InputGroup maxW="300px">
+                <InputElement>
+                  <FiSearch color="gray.300" />
+                </InputElement>
+                <Input placeholder="Search products..." />
+              </InputGroup>
+              
+              <Select 
+                placeholder="Filter by category" 
+                maxW="200px"
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+              >
+                <option value="all">All Categories</option>
+                <option value="fashion">Fashion</option>
+                <option value="food & beverage">Food & Beverage</option>
+                <option value="home decor">Home Decor</option>
+              </Select>
+            </HStack>
 
+            <Box overflowX="auto">
+              <TableContainer>
+                <Table>
+                  <Thead>
+                    <Tr>
+                      <Th>Product ID</Th>
+                      <Th>Name</Th>
+                      <Th>Category</Th>
+                      <Th>Price</Th>
+                      <Th>Stock</Th>
+                      <Th>Origin</Th>
+                      <Th>Actions</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {products
+                      .filter(
+                        product =>
+                          selectedCategory === 'all' ||
+                          product.category.toLowerCase() === selectedCategory
+                      )
+                      .map(product => (
+                        <Tr key={product.id}>
+                          <Td>{product.id}</Td>
+                          <Td>{product.name}</Td>
+                          <Td>{product.category}</Td>
+                          <Td>{product.price}</Td>
+                          <Td>{product.stock}</Td>
+                          <Td>{product.origin}</Td>
+                          <Td>
+                            <HStack>
+                              <Button
+                                size="sm"
+                                colorScheme="blue"
+                                onClick={() => router.push(`/admin/products/${product.id}`)}
+                              >
+                                Edit
+                              </Button>
+                            </HStack>
+                          </Td>
+                        </Tr>
+                      ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </Box>
+          </TabsContent>
+
+          <TabsContent value="customers">
             {/* Customers Panel */}
-            <TabPanel>
-              <Text fontSize="lg" mb={4}>
-                Customer management functionality will be implemented in the next phase.
-              </Text>
-              <Button colorScheme="brand">View All Customers</Button>
-            </TabPanel>
-          </TabPanels>
+            <Text>Customer management features coming soon.</Text>
+          </TabsContent>
         </Tabs>
       </Container>
     </MainLayout>
