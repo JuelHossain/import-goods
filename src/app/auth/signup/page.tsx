@@ -4,18 +4,19 @@ import {
   Box,
   Button,
   Container,
+  Stack,
+  Text,
+  Input,
+  Heading,
+} from '@chakra-ui/react';
+import {
   Divider,
   FormControl,
   FormLabel,
-  Heading,
-  Input,
-  Stack,
-  Text,
-  useColorModeValue,
-  useToast,
   FormErrorMessage,
   HStack,
   Checkbox,
+  useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -23,7 +24,7 @@ import { FaGoogle, FaFacebook } from 'react-icons/fa';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 
 type SignUpFormData = {
   fullName: string;
@@ -37,6 +38,7 @@ export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const router = useRouter();
+  const { signUp, signInWithProvider } = useAuth();
   const {
     handleSubmit,
     register,
@@ -60,21 +62,11 @@ export default function SignUp() {
 
     setIsLoading(true);
     try {
-      // In a real app, you would use Supabase authentication
-      // const { error } = await supabase.auth.signUp({
-      //   email: data.email,
-      //   password: data.password,
-      //   options: {
-      //     data: {
-      //       full_name: data.fullName,
-      //     },
-      //   },
-      // });
+      const { error } = await signUp(data.email, data.password, {
+        full_name: data.fullName,
+      });
       
-      // if (error) throw error;
-      
-      // For now, we'll just simulate a successful signup
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (error) throw error;
       
       toast({
         title: 'Account created.',
@@ -102,24 +94,15 @@ export default function SignUp() {
   const handleSocialSignUp = async (provider: 'google' | 'facebook') => {
     setIsLoading(true);
     try {
-      // In a real app, you would use Supabase social authentication
-      // const { error } = await supabase.auth.signInWithOAuth({
-      //   provider,
-      // });
+      await signInWithProvider(provider);
       
-      // if (error) throw error;
-      
-      // For now, we'll just simulate a successful signup
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      // Note: The actual redirect will be handled by Supabase OAuth
       toast({
-        title: `Sign up with ${provider} successful.`,
-        status: 'success',
-        duration: 3000,
+        title: `Redirecting to ${provider} login...`,
+        status: 'info',
+        duration: 2000,
         isClosable: true,
       });
-      
-      router.push('/');
     } catch (error) {
       console.error(`Error signing up with ${provider}:`, error);
       toast({
@@ -129,7 +112,6 @@ export default function SignUp() {
         duration: 5000,
         isClosable: true,
       });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -137,133 +119,123 @@ export default function SignUp() {
   return (
     <MainLayout>
       <Container maxW="lg" py={{ base: 12, md: 24 }}>
-        <Stack spacing={8}>
+        <Stack gap={8}>
           <Stack align="center">
-            <Heading fontSize="4xl">Create your account</Heading>
+            <Heading fontSize="4xl" textAlign="center">
+              Create your account
+            </Heading>
             <Text fontSize="lg" color="gray.600">
-              to start importing quality goods from around the world ✨
+              to enjoy all of our cool features ✌️
             </Text>
           </Stack>
           <Box
             rounded="lg"
-            bg={useColorModeValue('white', 'gray.700')}
+            bg="white"
+            _dark={{ bg: 'gray.700' }}
             boxShadow="lg"
             p={8}
           >
-            <Stack spacing={4}>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <Stack spacing={4}>
-                  <FormControl id="fullName" isInvalid={!!errors.fullName} isRequired>
-                    <FormLabel>Full Name</FormLabel>
-                    <Input
-                      type="text"
-                      {...register('fullName', {
-                        required: 'Full name is required',
-                      })}
-                    />
-                    <FormErrorMessage>{errors.fullName?.message}</FormErrorMessage>
-                  </FormControl>
-                  
-                  <FormControl id="email" isInvalid={!!errors.email} isRequired>
-                    <FormLabel>Email address</FormLabel>
-                    <Input
-                      type="email"
-                      {...register('email', {
-                        required: 'Email is required',
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: 'Invalid email address',
-                        },
-                      })}
-                    />
-                    <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-                  </FormControl>
-                  
-                  <FormControl id="password" isInvalid={!!errors.password} isRequired>
-                    <FormLabel>Password</FormLabel>
-                    <Input
-                      type="password"
-                      {...register('password', {
-                        required: 'Password is required',
-                        minLength: {
-                          value: 8,
-                          message: 'Password must be at least 8 characters',
-                        },
-                        pattern: {
-                          value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                          message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-                        },
-                      })}
-                    />
-                    <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
-                  </FormControl>
-                  
-                  <FormControl id="confirmPassword" isInvalid={!!errors.confirmPassword} isRequired>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <Input
-                      type="password"
-                      {...register('confirmPassword', {
-                        required: 'Please confirm your password',
-                        validate: value => value === password || 'Passwords do not match',
-                      })}
-                    />
-                    <FormErrorMessage>{errors.confirmPassword?.message}</FormErrorMessage>
-                  </FormControl>
-                  
-                  <FormControl id="agreeToTerms" isInvalid={!!errors.agreeToTerms}>
-                    <Checkbox
-                      {...register('agreeToTerms', {
-                        required: 'You must agree to the terms and conditions',
-                      })}
-                    >
-                      I agree to the{' '}
-                      <NextLink href="/terms" passHref>
-                        <Text as="span" color="brand.500">
-                          Terms of Service
-                        </Text>
-                      </NextLink>{' '}
-                      and{' '}
-                      <NextLink href="/privacy" passHref>
-                        <Text as="span" color="brand.500">
-                          Privacy Policy
-                        </Text>
-                      </NextLink>
-                    </Checkbox>
-                    <FormErrorMessage>{errors.agreeToTerms?.message}</FormErrorMessage>
-                  </FormControl>
-                  
-                  <Stack spacing={10} pt={2}>
-                    <Button
-                      loadingText="Submitting"
-                      size="lg"
-                      bg="brand.500"
-                      color="white"
-                      _hover={{
-                        bg: 'brand.600',
-                      }}
-                      type="submit"
-                      isLoading={isLoading}
-                    >
-                      Sign up
-                    </Button>
-                  </Stack>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack gap={4}>
+                <FormControl isInvalid={!!errors.fullName} isRequired>
+                  <FormLabel>Full Name</FormLabel>
+                  <Input
+                    {...register('fullName', {
+                      required: 'Full name is required',
+                    })}
+                  />
+                  <FormErrorMessage>{errors.fullName?.message}</FormErrorMessage>
+                </FormControl>
+                
+                <FormControl isInvalid={!!errors.email} isRequired>
+                  <FormLabel>Email address</FormLabel>
+                  <Input
+                    type="email"
+                    {...register('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Invalid email address',
+                      },
+                    })}
+                  />
+                  <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+                </FormControl>
+                
+                <FormControl isInvalid={!!errors.password} isRequired>
+                  <FormLabel>Password</FormLabel>
+                  <Input
+                    type="password"
+                    {...register('password', {
+                      required: 'Password is required',
+                      minLength: {
+                        value: 8,
+                        message: 'Password must be at least 8 characters',
+                      },
+                    })}
+                  />
+                  <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+                </FormControl>
+                
+                <FormControl isInvalid={!!errors.confirmPassword} isRequired>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <Input
+                    type="password"
+                    {...register('confirmPassword', {
+                      required: 'Please confirm your password',
+                      validate: value => value === password || 'Passwords do not match',
+                    })}
+                  />
+                  <FormErrorMessage>{errors.confirmPassword?.message}</FormErrorMessage>
+                </FormControl>
+                
+                <FormControl isInvalid={!!errors.agreeToTerms}>
+                  <Checkbox
+                    {...register('agreeToTerms', {
+                      required: 'You must agree to the terms and conditions',
+                    })}
+                  >
+                    I agree to the{' '}
+                    <NextLink href="/terms" passHref>
+                      <Text as="span" color="brand.500">
+                        Terms and Conditions
+                      </Text>
+                    </NextLink>
+                  </Checkbox>
+                  <FormErrorMessage>{errors.agreeToTerms?.message}</FormErrorMessage>
+                </FormControl>
+                
+                <Stack gap={10} pt={2}>
+                  <Button
+                    bg="brand.500"
+                    color="white"
+                    _hover={{
+                      bg: 'brand.600',
+                    }}
+                    type="submit"
+                    isLoading={isLoading}
+                  >
+                    Sign up
+                  </Button>
                 </Stack>
-              </form>
-
-              <Stack pt={6}>
-                <Text align="center">
-                  Already a user?{' '}
-                  <NextLink href="/auth/signin" passHref>
-                    <Text as="span" color="brand.500">
-                      Sign in
-                    </Text>
-                  </NextLink>
-                </Text>
+                
+                <Stack pt={6}>
+                  <Text textAlign="center">
+                    Already a user?{' '}
+                    <NextLink href="/auth/signin" passHref>
+                      <Text as="span" color="brand.500">
+                        Sign in
+                      </Text>
+                    </NextLink>
+                  </Text>
+                </Stack>
               </Stack>
-
-              <Divider my={6} />
-
-              <Stack spacing={4}>
+            </form>
+            
+            <Stack gap={4} mt={8}>
+              <Divider />
+              <Text textAlign="center">Or sign up with</Text>
+              <Stack gap={2}>
                 <Button
                   w="full"
                   variant="outline"
@@ -271,7 +243,7 @@ export default function SignUp() {
                   onClick={() => handleSocialSignUp('google')}
                   isLoading={isLoading}
                 >
-                  Sign up with Google
+                  Google
                 </Button>
                 <Button
                   w="full"
@@ -280,7 +252,7 @@ export default function SignUp() {
                   onClick={() => handleSocialSignUp('facebook')}
                   isLoading={isLoading}
                 >
-                  Sign up with Facebook
+                  Facebook
                 </Button>
               </Stack>
             </Stack>

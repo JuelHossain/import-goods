@@ -2,6 +2,7 @@
 
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { CacheProvider } from '@chakra-ui/next-js';
+import AuthProvider from '@/components/auth/AuthProvider';
 
 // Define your custom theme
 const theme = extendTheme({
@@ -57,7 +58,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <CacheProvider>
       <ChakraProvider theme={theme}>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </ChakraProvider>
     </CacheProvider>
   );

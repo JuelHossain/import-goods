@@ -13,9 +13,15 @@ import {
   Popover, 
   PopoverTrigger, 
   PopoverContent, 
-  useColorModeValue, 
+  useColorMode,
   useBreakpointValue, 
-  useDisclosure 
+  useDisclosure,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Avatar,
+  MenuDivider
 } from '@chakra-ui/react';
 import { 
   HamburgerIcon, 
@@ -24,23 +30,32 @@ import {
   ChevronRightIcon 
 } from '@chakra-ui/icons';
 import NextLink from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, signOut } = useAuth();
+  const { colorMode } = useColorMode();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/');
+  };
 
   return (
     <Box>
       <Flex
-        bg={useColorModeValue('white', 'gray.800')}
-        color={useColorModeValue('gray.600', 'white')}
+        bg={colorMode === 'light' ? 'white' : 'gray.800'}
+        color={colorMode === 'light' ? 'gray.600' : 'white'}
         minH={'60px'}
         py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
         borderStyle={'solid'}
-        borderColor={useColorModeValue('gray.200', 'gray.900')}
+        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.900'}
         align={'center'}>
         <Flex
           flex={{ base: 1, md: 'auto' }}
@@ -59,7 +74,7 @@ export default function Navbar() {
           <Text
             textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
             fontFamily={'heading'}
-            color={useColorModeValue('gray.800', 'white')}
+            color={colorMode === 'light' ? 'gray.800' : 'white'}
             fontWeight="bold"
             fontSize="xl">
             <Link as={NextLink} href="/">
@@ -77,27 +92,55 @@ export default function Navbar() {
           justify={'flex-end'}
           direction={'row'}
           spacing={6}>
-          <Button
-            as={NextLink}
-            fontSize={'sm'}
-            fontWeight={400}
-            variant={'link'}
-            href={'/auth/signin'}>
-            Sign In
-          </Button>
-          <Button
-            as={NextLink}
-            display={{ base: 'none', md: 'inline-flex' }}
-            fontSize={'sm'}
-            fontWeight={600}
-            color={'white'}
-            bg={'brand.500'}
-            href={'/auth/signup'}
-            _hover={{
-              bg: 'brand.600',
-            }}>
-            Sign Up
-          </Button>
+          {user ? (
+            <Menu>
+              <MenuButton
+                as={Button}
+                rounded={'full'}
+                variant={'link'}
+                cursor={'pointer'}
+                minW={0}>
+                <Avatar
+                  size={'sm'}
+                  src={user.user_metadata?.avatar_url || ''}
+                  name={user.user_metadata?.full_name || user.email?.charAt(0).toUpperCase()}
+                />
+              </MenuButton>
+              <MenuList>
+                <MenuItem as={NextLink} href="/profile">Profile</MenuItem>
+                <MenuItem as={NextLink} href="/orders">My Orders</MenuItem>
+                {user.app_metadata?.role === 'admin' && (
+                  <MenuItem as={NextLink} href="/admin">Admin Dashboard</MenuItem>
+                )}
+                <MenuDivider />
+                <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+              </MenuList>
+            </Menu>
+          ) : (
+            <>
+              <Button
+                as={NextLink}
+                fontSize={'sm'}
+                fontWeight={400}
+                variant={'link'}
+                href={'/auth/signin'}>
+                Sign In
+              </Button>
+              <Button
+                as={NextLink}
+                display={{ base: 'none', md: 'inline-flex' }}
+                fontSize={'sm'}
+                fontWeight={600}
+                color={'white'}
+                bg={'brand.500'}
+                href={'/auth/signup'}
+                _hover={{
+                  bg: 'brand.600',
+                }}>
+                Sign Up
+              </Button>
+            </>
+          )}
         </Stack>
       </Flex>
 
@@ -109,9 +152,10 @@ export default function Navbar() {
 }
 
 const DesktopNav = ({ pathname }: { pathname: string }) => {
-  const linkColor = useColorModeValue('gray.600', 'gray.200');
-  const linkHoverColor = useColorModeValue('gray.800', 'white');
-  const popoverContentBgColor = useColorModeValue('white', 'gray.800');
+  const { colorMode } = useColorMode();
+  const linkColor = colorMode === 'light' ? 'gray.600' : 'gray.200';
+  const linkHoverColor = colorMode === 'light' ? 'gray.800' : 'white';
+  const popoverContentBgColor = colorMode === 'light' ? 'white' : 'gray.800';
 
   return (
     <Stack direction={'row'} spacing={4}>
@@ -157,6 +201,8 @@ const DesktopNav = ({ pathname }: { pathname: string }) => {
 };
 
 const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
+  const { colorMode } = useColorMode();
+
   return (
     <Link
       as={NextLink}
@@ -165,7 +211,7 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
       display={'block'}
       p={2}
       rounded={'md'}
-      _hover={{ bg: useColorModeValue('brand.50', 'gray.900') }}>
+      _hover={{ bg: colorMode === 'light' ? 'brand.50' : 'gray.900' }}>
       <Stack direction={'row'} align={'center'}>
         <Box>
           <Text
@@ -192,9 +238,11 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
 };
 
 const MobileNav = () => {
+  const { colorMode } = useColorMode();
+
   return (
     <Stack
-      bg={useColorModeValue('white', 'gray.800')}
+      bg={colorMode === 'light' ? 'white' : 'gray.800'}
       p={4}
       display={{ md: 'none' }}>
       {NAV_ITEMS.map((navItem) => (
@@ -206,6 +254,7 @@ const MobileNav = () => {
 
 const MobileNavItem = ({ label, children, href }: NavItem) => {
   const { isOpen, onToggle } = useDisclosure();
+  const { colorMode } = useColorMode();
 
   return (
     <Stack spacing={4} onClick={children && onToggle}>
@@ -220,7 +269,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         }}>
         <Text
           fontWeight={600}
-          color={useColorModeValue('gray.600', 'gray.200')}>
+          color={colorMode === 'light' ? 'gray.600' : 'gray.200'}>
           {label}
         </Text>
         {children && (
@@ -240,7 +289,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
           pl={4}
           borderLeft={1}
           borderStyle={'solid'}
-          borderColor={useColorModeValue('gray.200', 'gray.700')}
+          borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
           align={'start'}>
           {children &&
             children.map((child) => (
