@@ -11,11 +11,15 @@ import {
   useColorModeValue,
   createIcon,
   SimpleGrid,
-  Image,
   Flex,
+  Link,
+  Card,
+  Circle,
+  VStack,
 } from '@chakra-ui/react';
 import MainLayout from '@/components/layout/MainLayout';
 import NextLink from 'next/link';
+import NextImage from 'next/image';
 
 export default function Home() {
   return (
@@ -91,41 +95,79 @@ export default function Home() {
       </Container>
 
       {/* Featured Products Section */}
-      <Box py={12}>
-        <Container maxW={'6xl'}>
-          <Heading as="h2" size="xl" mb={8} textAlign="center">
+      <Box 
+        py={{ base: 12, md: 16 }} 
+        bg={useColorModeValue('gray.50', 'gray.800')}
+      >
+        <Container maxW="container.xl">
+          <Heading 
+            as="h2" 
+            fontSize={{ base: '2xl', md: '3xl' }} 
+            mb={8} 
+            textAlign="center"
+            color={useColorModeValue('gray.900', 'white')}
+          >
             Featured Products
           </Heading>
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
+          
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={8}>
             {featuredProducts.map((product) => (
-              <Box
-                key={product.id}
+              <Card 
+                key={product.id} 
                 bg={useColorModeValue('white', 'gray.700')}
-                boxShadow={'md'}
-                rounded={'md'}
-                overflow={'hidden'}
-                transition="transform 0.3s"
-                _hover={{ transform: 'translateY(-5px)' }}
+                boxShadow="md" 
+                rounded="md" 
+                overflow="hidden"
+                transition="all 0.3s"
+                height="100%"
+                _hover={{ 
+                  transform: 'translateY(-5px)',
+                  boxShadow: 'xl',
+                  bg: useColorModeValue('gray.50', 'gray.600')
+                }}
+                as={Link}
+                href={`/products/${product.id}`}
               >
-                <Image
-                  h={'240px'}
-                  w={'full'}
-                  src={product.image}
-                  objectFit={'cover'}
-                  alt={product.name}
-                />
+                <Box position="relative" height="240px" width="100%">
+                  <NextImage
+                    src={product.image || '/images/placeholder.jpg'}
+                    alt={product.name}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    priority={product.id === featuredProducts[0].id}
+                  />
+                </Box>
                 <Box p={6}>
                   <Stack spacing={0} align={'center'} mb={5}>
-                    <Heading fontSize={'xl'} fontWeight={500} fontFamily={'body'}>
+                    <Heading 
+                      fontSize="lg" 
+                      fontWeight={500} 
+                      textAlign="center"
+                      color={useColorModeValue('gray.800', 'white')}
+                    >
                       {product.name}
                     </Heading>
-                    <Text color={useColorModeValue('gray.500', 'gray.300')}>{product.merchant}</Text>
+                    <Text 
+                      color={useColorModeValue('gray.600', 'gray.300')} 
+                      fontSize="sm"
+                    >
+                      {product.merchant}
+                    </Text>
                   </Stack>
 
                   <Stack direction={'row'} justify={'center'} spacing={6}>
                     <Stack spacing={0} align={'center'}>
-                      <Text fontWeight={600}>${product.price}</Text>
-                      <Text fontSize={'sm'} color={useColorModeValue('gray.500', 'gray.300')}>
+                      <Text 
+                        fontWeight={600} 
+                        color="brand.500" 
+                        fontSize="xl"
+                      >
+                        ${product.price}
+                      </Text>
+                      <Text 
+                        fontSize="xs" 
+                        color={useColorModeValue('gray.500', 'gray.400')}
+                      >
                         {product.category}
                       </Text>
                     </Stack>
@@ -147,83 +189,122 @@ export default function Home() {
                     View Details
                   </Button>
                 </Box>
-              </Box>
+              </Card>
             ))}
           </SimpleGrid>
         </Container>
       </Box>
 
       {/* How It Works Section */}
-      <Box bg={useColorModeValue('gray.50', 'gray.900')} py={16}>
-        <Container maxW={'6xl'}>
-          <Stack spacing={4} as={Container} maxW={'3xl'} textAlign={'center'} mb={12}>
-            <Heading fontSize={'3xl'}>How It Works</Heading>
-            <Text color={useColorModeValue('gray.600', 'gray.300')} fontSize={'xl'}>
-              Our simple process makes importing goods easy and accessible for everyone.
-            </Text>
-          </Stack>
-
+      <Box py={{ base: 12, md: 16 }} bg={useColorModeValue('white', 'gray.700')}>
+        <Container maxW="container.xl">
+          <Heading 
+            as="h2" 
+            fontSize={{ base: '2xl', md: '3xl' }} 
+            mb={12} 
+            textAlign="center"
+            color={useColorModeValue('gray.900', 'white')}
+          >
+            How It Works
+          </Heading>
+          
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
-            {steps.map((step) => (
-              <Box 
-                key={step.id} 
-                p={5} 
-                shadow={'md'} 
-                borderWidth={'1px'} 
-                bg={useColorModeValue('white', 'gray.700')} 
-                rounded="md"
+            {steps.map((step, index) => (
+              <VStack 
+                key={index} 
+                align="center" 
+                p={6} 
+                bg={useColorModeValue('gray.50', 'gray.600')}
+                rounded="lg" 
+                boxShadow="sm"
+                height="100%"
               >
-                <Flex
-                  w={16}
-                  h={16}
-                  align={'center'}
-                  justify={'center'}
-                  color={'white'}
-                  rounded={'full'}
-                  bg={'brand.500'}
-                  mb={4}>
-                  {step.icon}
-                </Flex>
-                <Heading fontSize={'xl'} mb={2}>{step.title}</Heading>
-                <Text color={useColorModeValue('gray.600', 'gray.300')}>{step.text}</Text>
-              </Box>
+                <Circle 
+                  size="60px" 
+                  bg="brand.500" 
+                  color="white" 
+                  fontSize="xl" 
+                  fontWeight="bold"
+                >
+                  {index + 1}
+                </Circle>
+                <Heading 
+                  size="md" 
+                  mt={4} 
+                  mb={2}
+                  color={useColorModeValue('gray.800', 'white')}
+                >
+                  {step.title}
+                </Heading>
+                <Text 
+                  textAlign="center"
+                  color={useColorModeValue('gray.600', 'gray.300')}
+                >
+                  {step.text}
+                </Text>
+              </VStack>
             ))}
           </SimpleGrid>
         </Container>
       </Box>
 
       {/* Call to Action */}
-      <Box bg={useColorModeValue('brand.500', 'brand.600')} color="white" py={16}>
-        <Container maxW={'3xl'} textAlign={'center'}>
-          <Heading mb={4}>Ready to start importing?</Heading>
-          <Text fontSize={'xl'} mb={6}>
-            Join thousands of satisfied customers who have transformed their businesses with our products.
-          </Text>
-          <Stack direction={{ base: 'column', md: 'row' }} spacing={4} justify={'center'}>
-            <Button
-              as={NextLink}
-              href={'/auth/signup'}
-              bg={'white'}
-              color={'brand.500'}
-              _hover={{
-                bg: 'gray.100',
-              }}
-              size={'lg'}
-              fontWeight={'bold'}
-              rounded={'full'}>
-              Sign Up Now
-            </Button>
-            <Button
-              as={NextLink}
-              href={'/contact'}
-              variant={'outline'}
-              colorScheme={'whiteAlpha'}
-              size={'lg'}
-              fontWeight={'bold'}
-              rounded={'full'}>
-              Contact Us
-            </Button>
-          </Stack>
+      <Box
+        py={{ base: 12, md: 16 }}
+        bg={useColorModeValue('brand.50', 'gray.800')}
+      >
+        <Container maxW="container.xl">
+          <Flex 
+            direction={{ base: 'column', md: 'row' }} 
+            align="center" 
+            justify="space-between"
+            bg={useColorModeValue('white', 'gray.700')}
+            p={{ base: 8, md: 12 }}
+            rounded="lg"
+            boxShadow="md"
+          >
+            <Box mb={{ base: 6, md: 0 }} pr={{ base: 0, md: 8 }}>
+              <Heading 
+                as="h3" 
+                fontSize={{ base: 'xl', md: '2xl' }}
+                mb={3}
+                color={useColorModeValue('gray.900', 'white')}
+              >
+                Ready to discover unique products?
+              </Heading>
+              <Text 
+                color={useColorModeValue('gray.600', 'gray.300')}
+                fontSize={{ base: 'md', md: 'lg' }}
+              >
+                Browse our exclusive collection of international goods and pre-order your favorites today.
+              </Text>
+            </Box>
+            <Stack direction={{ base: 'column', md: 'row' }} spacing={4} justify={'center'}>
+              <Button
+                as={NextLink}
+                href={'/auth/signup'}
+                bg={'white'}
+                color={'brand.500'}
+                _hover={{
+                  bg: 'gray.100',
+                }}
+                size={'lg'}
+                fontWeight={'bold'}
+                rounded={'full'}>
+                Sign Up Now
+              </Button>
+              <Button
+                as={NextLink}
+                href={'/contact'}
+                variant={'outline'}
+                colorScheme={'whiteAlpha'}
+                size={'lg'}
+                fontWeight={'bold'}
+                rounded={'full'}>
+                Contact Us
+              </Button>
+            </Stack>
+          </Flex>
         </Container>
       </Box>
     </MainLayout>

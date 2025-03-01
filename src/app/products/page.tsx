@@ -1,21 +1,21 @@
 'use client';
 
 import {
-  Box,
   Container,
+  Box,
   Heading,
   Text,
   SimpleGrid,
-  Image,
   Stack,
-  Button,
   Flex,
   Input,
-  Select,
   InputGroup,
   InputLeftElement,
+  Select,
+  Button,
   Badge,
   useColorMode,
+  useColorModeValue,
   Card,
   CardBody,
   CardFooter,
@@ -25,6 +25,7 @@ import {
 import { useState } from 'react';
 import { SearchIcon } from '@chakra-ui/icons';
 import NextLink from 'next/link';
+import NextImage from 'next/image';
 import MainLayout from '@/components/layout/MainLayout';
 
 // Mock product data
@@ -144,6 +145,21 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('featured');
 
+  // Color mode values
+  const bgColor = useColorModeValue('white', 'gray.700');
+  const textColor = useColorModeValue('gray.700', 'gray.300');
+  const lightTextColor = useColorModeValue('gray.600', 'gray.400');
+  const headingColor = useColorModeValue('gray.900', 'white');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  const pageBackgroundColor = useColorModeValue('gray.50', 'gray.800');
+  const filterBgColor = useColorModeValue('white', 'gray.700');
+  const productCardBgColor = useColorModeValue('white', 'gray.700');
+  const productCardHoverBgColor = useColorModeValue('gray.50', 'gray.600');
+  const selectBgColor = useColorModeValue('white', 'gray.700');
+  const selectBorderColor = useColorModeValue('gray.200', 'gray.600');
+  const selectColor = useColorModeValue('gray.800', 'white');
+  const selectPlaceholderColor = useColorModeValue('gray.500', 'gray.400');
+
   // Filter products based on search query and category
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -168,13 +184,13 @@ export default function ProductsPage() {
 
   return (
     <MainLayout>
-      <Container maxW="container.xl" py={12}>
+      <Container maxW="container.xl" py={12} bg={pageBackgroundColor}>
         <Stack gap={8}>
           <Box textAlign="center">
-            <Heading as="h1" size="xl" mb={4}>
+            <Heading as="h1" size="xl" mb={4} color={headingColor}>
               Our Products
             </Heading>
-            <Text color={colorMode === 'dark' ? 'gray.300' : 'gray.600'} maxW="container.md" mx="auto">
+            <Text color={textColor} maxW="container.md" mx="auto">
               Explore our curated collection of high-quality products from trusted merchants around the world.
             </Text>
           </Box>
@@ -182,27 +198,41 @@ export default function ProductsPage() {
           {/* Filters and Search */}
           <Flex 
             direction={{ base: 'column', md: 'row' }} 
-            gap={4} 
-            bg={colorMode === 'dark' ? 'gray.700' : 'white'} 
-            p={5} 
-            borderRadius="md" 
+            gap={{ base: 4, md: 6 }} 
+            bg={filterBgColor} 
+            p={{ base: 5, md: 6 }} 
+            borderRadius="lg" 
             boxShadow="sm"
+            borderWidth="1px"
+            borderColor={borderColor}
+            alignItems="center"
           >
             <InputGroup flex={1}>
               <InputLeftElement pointerEvents="none">
-                <SearchIcon color={colorMode === 'dark' ? 'gray.300' : 'gray.400'} />
+                <SearchIcon color={lightTextColor} />
               </InputLeftElement>
               <Input 
                 placeholder="Search products..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                bg={selectBgColor}
+                borderColor={selectBorderColor}
+                color={selectColor}
+                _placeholder={{ color: selectPlaceholderColor }}
+                _hover={{ borderColor: 'brand.400' }}
+                _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px var(--chakra-colors-brand-500)' }}
               />
             </InputGroup>
             
             <Select 
-              maxW={{ base: 'full', md: '200px' }} 
+              maxW={{ base: 'full', md: '220px' }} 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
+              bg={selectBgColor}
+              borderColor={selectBorderColor}
+              color={selectColor}
+              _hover={{ borderColor: 'brand.400' }}
+              _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px var(--chakra-colors-brand-500)' }}
             >
               {categories.map(category => (
                 <option key={category} value={category}>
@@ -212,9 +242,14 @@ export default function ProductsPage() {
             </Select>
             
             <Select 
-              maxW={{ base: 'full', md: '200px' }} 
+              maxW={{ base: 'full', md: '220px' }} 
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
+              bg={selectBgColor}
+              borderColor={selectBorderColor}
+              color={selectColor}
+              _hover={{ borderColor: 'brand.400' }}
+              _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px var(--chakra-colors-brand-500)' }}
             >
               <option value="featured">Featured</option>
               <option value="priceLow">Price: Low to High</option>
@@ -229,12 +264,12 @@ export default function ProductsPage() {
               {sortedProducts.map((product) => (
                 <Card
                   key={product.id}
-                  bg={colorMode === 'dark' ? 'gray.700' : 'white'}
+                  bg={productCardBgColor}
                   boxShadow="md"
                   rounded="md"
                   overflow="hidden"
                   transition="transform 0.3s"
-                  _hover={{ transform: 'translateY(-5px)' }}
+                  _hover={{ transform: 'translateY(-5px)', bg: productCardHoverBgColor }}
                   position="relative"
                   height="100%"
                 >
@@ -262,28 +297,29 @@ export default function ProductsPage() {
                       Out of Stock
                     </Tag>
                   )}
-                  <Image
-                    h="200px"
-                    w="full"
-                    src={product.image}
-                    objectFit="cover"
-                    alt={product.name}
-                  />
+                  <Box position="relative" h="200px" w="100%">
+                    <NextImage
+                      src={product.image || '/images/placeholder.jpg'}
+                      alt={product.name}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </Box>
                   <CardBody>
                     <Stack gap={1} align="center">
                       <Heading fontSize="lg" fontWeight={500} textAlign="center">
                         {product.name}
                       </Heading>
-                      <Text color={colorMode === 'dark' ? 'gray.300' : 'gray.500'} fontSize="sm">
+                      <Text color={lightTextColor} fontSize="sm">
                         {product.merchant}
                       </Text>
                       <Text fontWeight={600} color="brand.500" fontSize="xl">
                         ${product.price}
                       </Text>
-                      <Text fontSize="xs" color={colorMode === 'dark' ? 'gray.400' : 'gray.500'}>
+                      <Text fontSize="xs" color={lightTextColor}>
                         {product.category}
                       </Text>
-                      <Text fontSize="xs" color={colorMode === 'dark' ? 'gray.400' : 'gray.500'}>
+                      <Text fontSize="xs" color={lightTextColor}>
                         Origin: {product.origin}
                       </Text>
                     </Stack>
@@ -308,7 +344,7 @@ export default function ProductsPage() {
               ))}
             </SimpleGrid>
           ) : (
-            <Box textAlign="center" py={10} bg={colorMode === 'dark' ? 'gray.700' : 'white'} borderRadius="md">
+            <Box textAlign="center" py={10} bg={filterBgColor} borderRadius="md">
               <Text fontSize="lg">No products found matching your criteria.</Text>
               <Button 
                 mt={4} 

@@ -35,18 +35,23 @@ import { FiUsers, FiShoppingBag, FiDollarSign, FiActivity, FiSearch } from 'reac
 import { useRouter } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
 
+// Import centralized mock data
+import { mockOrders, mockPreOrders, getOrdersByStatus } from '@/data/mock/orders';
+import { mockUsers, getCustomerUsers } from '@/data/mock/users';
+import { mockProducts } from '@/data/mock/products';
+
 // Mock data for dashboard
 const dashboardStats = [
   {
     label: 'Total Customers',
-    value: 1243,
+    value: getCustomerUsers().length,
     change: 12.5,
     icon: FiUsers,
     color: 'blue.500',
   },
   {
     label: 'Total Orders',
-    value: 4587,
+    value: mockOrders.length,
     change: 23.1,
     icon: FiShoppingBag,
     color: 'green.500',
@@ -64,106 +69,6 @@ const dashboardStats = [
     change: -2.3,
     icon: FiActivity,
     color: 'orange.500',
-  },
-];
-
-// Mock data for recent orders
-const recentOrders = [
-  {
-    id: 'ORD-001',
-    customer: 'John Smith',
-    date: '2023-05-15',
-    amount: '$245.99',
-    status: 'Completed',
-  },
-  {
-    id: 'ORD-002',
-    customer: 'Sarah Johnson',
-    date: '2023-05-14',
-    amount: '$189.50',
-    status: 'Processing',
-  },
-  {
-    id: 'ORD-003',
-    customer: 'Michael Brown',
-    date: '2023-05-14',
-    amount: '$532.20',
-    status: 'Shipped',
-  },
-  {
-    id: 'ORD-004',
-    customer: 'Emily Davis',
-    date: '2023-05-13',
-    amount: '$76.00',
-    status: 'Completed',
-  },
-  {
-    id: 'ORD-005',
-    customer: 'David Wilson',
-    date: '2023-05-12',
-    amount: '$124.30',
-    status: 'Processing',
-  },
-];
-
-// Mock data for pre-orders
-const preOrders = [
-  {
-    id: 'PRE-001',
-    customer: 'Alice Williams',
-    date: '2023-05-10',
-    amount: '$349.99',
-    estimatedShipping: '2023-06-15',
-  },
-  {
-    id: 'PRE-002',
-    customer: 'Robert Jones',
-    date: '2023-05-09',
-    amount: '$189.50',
-    estimatedShipping: '2023-06-20',
-  },
-  {
-    id: 'PRE-003',
-    customer: 'Jennifer Miller',
-    date: '2023-05-08',
-    amount: '$432.20',
-    estimatedShipping: '2023-06-10',
-  },
-];
-
-// Mock data for products
-const products = [
-  {
-    id: 'PROD-001',
-    name: 'Handcrafted Leather Bag',
-    category: 'Fashion',
-    price: '$299.99',
-    stock: 24,
-    origin: 'Italy',
-  },
-  {
-    id: 'PROD-002',
-    name: 'Premium Coffee Beans',
-    category: 'Food & Beverage',
-    price: '$49.99',
-    stock: 156,
-    origin: 'Colombia',
-  },
-  {
-    id: 'PROD-003',
-    name: 'Artisanal Ceramic Vase',
-    category: 'Home Decor',
-    price: '$89.99',
-    stock: 42,
-    origin: 'Portugal',
-  },
-  {
-    id: 'PROD-004',
-    name: 'Organic Olive Oil',
-    category: 'Food & Beverage',
-    price: '$24.99',
-    stock: 78,
-    origin: 'Greece',
   },
 ];
 
@@ -408,7 +313,7 @@ export default function AdminDashboard() {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {recentOrders
+                        {mockOrders
                           .filter(
                             order =>
                               (selectedStatus === 'all' ||
@@ -489,7 +394,7 @@ export default function AdminDashboard() {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {preOrders
+                        {mockPreOrders
                           .filter(
                             order =>
                               searchQuery === '' ||
@@ -578,7 +483,7 @@ export default function AdminDashboard() {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {products
+                        {mockProducts
                           .filter(
                             product =>
                               (selectedCategory === 'all' ||

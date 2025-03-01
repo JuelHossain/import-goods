@@ -36,11 +36,15 @@ export interface AuthContextType {
 /**
  * Create a mock user for development
  */
-const createMockUser = (email: string = 'mock@example.com'): User => ({
-  id: 'mock-user-id',
+const createMockUser = (email: string = 'admin@importgoods.com'): User => ({
+  id: 'mock-admin-user-id',
   email,
+  app_metadata: {
+    role: 'admin'
+  },
   user_metadata: {
-    full_name: 'Mock User',
+    full_name: 'Admin User',
+    is_admin: true
   },
 } as User);
 
@@ -82,27 +86,37 @@ export const useProvideAuth = (): AuthContextType => {
   const initializeSession = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      if (supabase) {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting session:', error);
-        }
-        
-        if (session) {
-          setSession(session);
-          setUser(session.user);
-        }
-      } else {
-        // Mock session for development
-        console.log('Using mock session for development');
-        // Create a mock session after a delay to simulate loading
-        setTimeout(() => {
-          const mockUser = createMockUser();
-          setUser(mockUser);
-          setSession(createMockSession(mockUser));
-        }, 1000);
-      }
+      // TEMPORARY: Always use mock session with admin privileges for testing
+      // Remove this override for production use
+      console.log('DEVELOPMENT MODE: Using mock admin session');
+      const mockUser = createMockUser();
+      setUser(mockUser);
+      setSession(createMockSession(mockUser));
+      setIsLoading(false);
+      return;
+
+      // Original code:
+      // if (supabase) {
+      //   const { data: { session }, error } = await supabase.auth.getSession();
+      //   
+      //   if (error) {
+      //     console.error('Error getting session:', error);
+      //   }
+      //   
+      //   if (session) {
+      //     setSession(session);
+      //     setUser(session.user);
+      //   }
+      // } else {
+      //   // Mock session for development
+      //   console.log('Using mock session for development');
+      //   // Create a mock session after a delay to simulate loading
+      //   setTimeout(() => {
+      //     const mockUser = createMockUser();
+      //     setUser(mockUser);
+      //     setSession(createMockSession(mockUser));
+      //   }, 1000);
+      // }
     } catch (error) {
       console.error('Session retrieval error:', error);
     } finally {
@@ -117,25 +131,32 @@ export const useProvideAuth = (): AuthContextType => {
     // Get session from Supabase
     initializeSession();
 
-    // Set up listener for auth state changes
-    if (supabase) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        (event: string, session: Session | null) => {
-          if (session) {
-            setSession(session);
-            setUser(session.user);
-          } else {
-            setSession(null);
-            setUser(null);
-          }
-          setIsLoading(false);
-        }
-      );
+    // TEMPORARY: Skip auth state changes for testing
+    // Restore this code for production
+    return () => {
+      // No-op cleanup function
+    };
 
-      return () => {
-        subscription?.unsubscribe();
-      };
-    }
+    // Original code:
+    // // Set up listener for auth state changes
+    // if (supabase) {
+    //   const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    //     (event: string, session: Session | null) => {
+    //       if (session) {
+    //         setSession(session);
+    //         setUser(session.user);
+    //       } else {
+    //         setSession(null);
+    //         setUser(null);
+    //       }
+    //       setIsLoading(false);
+    //     }
+    //   );
+    //
+    //   return () => {
+    //     subscription?.unsubscribe();
+    //   };
+    // }
   }, []);
 
   /**

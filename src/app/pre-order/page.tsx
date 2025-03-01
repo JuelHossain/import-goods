@@ -15,6 +15,7 @@ import {
   VStack,
   FormErrorMessage,
   Divider,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -89,30 +90,42 @@ export default function PreOrderPage() {
             <Heading as="h1" size="xl" mb={4}>
               Pre-Order Form
             </Heading>
-            <Text color="gray.600">
+            <Text color={useColorModeValue('gray.600', 'gray.300')}>
               Can't find what you're looking for? Submit a pre-order request and we'll source it for you.
             </Text>
           </Box>
 
-          <Box bg="white" p={8} borderRadius="md" boxShadow="md">
+          <Box 
+            bg={useColorModeValue('white', 'gray.700')} 
+            p={8} 
+            borderRadius="md" 
+            boxShadow="md"
+            borderWidth="1px"
+            borderColor={useColorModeValue('gray.200', 'gray.600')}
+          >
             <form onSubmit={handleSubmit(onSubmit)}>
               <Stack spacing={6}>
-                <Heading as="h3" size="md">
+                <Heading as="h3" size="md" color={useColorModeValue('gray.800', 'white')}>
                   Contact Information
                 </Heading>
                 
                 <FormControl isInvalid={!!errors.name} isRequired>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel color={useColorModeValue('gray.700', 'gray.200')}>Full Name</FormLabel>
                   <Input 
                     {...register('name', { 
                       required: 'Name is required' 
                     })} 
+                    bg={useColorModeValue('white', 'gray.800')}
+                    borderColor={useColorModeValue('gray.300', 'gray.600')}
+                    _hover={{
+                      borderColor: useColorModeValue('gray.400', 'gray.500')
+                    }}
                   />
                   <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={!!errors.email} isRequired>
-                  <FormLabel>Email Address</FormLabel>
+                  <FormLabel color={useColorModeValue('gray.700', 'gray.200')}>Email Address</FormLabel>
                   <Input 
                     type="email" 
                     {...register('email', { 
@@ -122,53 +135,78 @@ export default function PreOrderPage() {
                         message: 'Invalid email address',
                       }
                     })} 
+                    bg={useColorModeValue('white', 'gray.800')}
+                    borderColor={useColorModeValue('gray.300', 'gray.600')}
+                    _hover={{
+                      borderColor: useColorModeValue('gray.400', 'gray.500')
+                    }}
                   />
                   <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={!!errors.phone} isRequired>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel color={useColorModeValue('gray.700', 'gray.200')}>Phone Number</FormLabel>
                   <Input 
                     type="tel" 
                     {...register('phone', { 
                       required: 'Phone number is required' 
                     })} 
+                    bg={useColorModeValue('white', 'gray.800')}
+                    borderColor={useColorModeValue('gray.300', 'gray.600')}
+                    _hover={{
+                      borderColor: useColorModeValue('gray.400', 'gray.500')
+                    }}
                   />
                   <FormErrorMessage>{errors.phone?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={!!errors.shippingAddress} isRequired>
-                  <FormLabel>Shipping Address</FormLabel>
+                  <FormLabel color={useColorModeValue('gray.700', 'gray.200')}>Shipping Address</FormLabel>
                   <Textarea 
                     {...register('shippingAddress', { 
                       required: 'Shipping address is required' 
                     })} 
+                    bg={useColorModeValue('white', 'gray.800')}
+                    borderColor={useColorModeValue('gray.300', 'gray.600')}
+                    _hover={{
+                      borderColor: useColorModeValue('gray.400', 'gray.500')
+                    }}
                   />
                   <FormErrorMessage>{errors.shippingAddress?.message}</FormErrorMessage>
                 </FormControl>
 
-                <Divider my={4} />
+                <Divider my={4} borderColor={useColorModeValue('gray.200', 'gray.600')} />
 
-                <Heading as="h3" size="md">
+                <Heading as="h3" size="md" color={useColorModeValue('gray.800', 'white')}>
                   Product Information
                 </Heading>
 
                 <FormControl isInvalid={!!errors.productLink} isRequired>
-                  <FormLabel>Product Link</FormLabel>
+                  <FormLabel color={useColorModeValue('gray.700', 'gray.200')}>Product Link</FormLabel>
                   <Input 
                     {...register('productLink', { 
                       required: 'Product link is required' 
                     })} 
                     placeholder="https://example.com/product"
+                    bg={useColorModeValue('white', 'gray.800')}
+                    borderColor={useColorModeValue('gray.300', 'gray.600')}
+                    _hover={{
+                      borderColor: useColorModeValue('gray.400', 'gray.500')
+                    }}
                   />
                   <FormErrorMessage>{errors.productLink?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={!!errors.notes}>
-                  <FormLabel>Additional Notes</FormLabel>
+                  <FormLabel color={useColorModeValue('gray.700', 'gray.200')}>Additional Notes</FormLabel>
                   <Textarea 
                     {...register('notes')} 
                     placeholder="Provide any additional details about your request..."
+                    bg={useColorModeValue('white', 'gray.800')}
+                    borderColor={useColorModeValue('gray.300', 'gray.600')}
+                    _hover={{
+                      borderColor: useColorModeValue('gray.400', 'gray.500')
+                    }}
                   />
                   <FormErrorMessage>{errors.notes?.message}</FormErrorMessage>
                 </FormControl>

@@ -5,7 +5,6 @@ import {
   Container,
   Stack,
   Text,
-  Image,
   Flex,
   VStack,
   Button,
@@ -18,14 +17,16 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
   Spinner,
   Center,
   Card,
   CardBody,
   Divider,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { useColorMode } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
@@ -34,6 +35,7 @@ import { FaHeart, FaRegHeart, FaShoppingCart } from 'react-icons/fa';
 import NextLink from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
+import NextImage from 'next/image';
 
 // Mock product data - this would come from your API/database in a real app
 const products = [
@@ -133,6 +135,19 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
 
+  // Color mode values
+  const bgColor = useColorModeValue('white', 'gray.700');
+  const textColor = useColorModeValue('gray.700', 'gray.300');
+  const lightTextColor = useColorModeValue('gray.600', 'gray.300');
+  const headingColor = useColorModeValue('gray.900', 'white');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  const preOrderBgColor = useColorModeValue('gray.100', 'gray.600');
+  const preOrderColor = useColorModeValue('gray.800', 'white');
+  const preOrderHoverBgColor = useColorModeValue('gray.200', 'gray.500');
+  const tabBorderColor = useColorModeValue('gray.200', 'gray.600');
+  const tabSelectedColor = useColorModeValue('brand.500', 'brand.300');
+  const tabHoverColor = useColorModeValue('gray.100', 'gray.600');
+
   useEffect(() => {
     // In a real app, you would fetch the product data from your API
     const fetchProduct = async () => {
@@ -187,11 +202,16 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <MainLayout>
-        <Container maxW="container.xl" py={12}>
-          <Text>Product not found</Text>
-          <Button as="a" href="/products" mt={4}>
-            Back to Products
-          </Button>
+        <Container maxW="container.xl" py={8}>
+          <Box textAlign="center" py={10}>
+            <Heading as="h2" size="xl" mb={4}>
+              Product Not Found
+            </Heading>
+            <Text mb={6}>We couldn&apos;t find the product you&apos;re looking for.</Text>
+            <Button as={NextLink} href="/products" colorScheme="brand" size="lg">
+              Browse Products
+            </Button>
+          </Box>
         </Container>
       </MainLayout>
     );
@@ -217,7 +237,7 @@ export default function ProductDetail() {
         </Breadcrumb>
 
         <Card 
-          bg={colorMode === 'dark' ? 'gray.700' : 'white'} 
+          bg={bgColor} 
           boxShadow="md"
           borderRadius="lg"
           overflow="hidden"
@@ -226,34 +246,40 @@ export default function ProductDetail() {
           <CardBody p={0}>
             <SimpleGrid columns={{ base: 1, lg: 2 }}>
               <Flex direction="column" p={6}>
-                <Image
-                  rounded="md"
-                  alt={product.name}
-                  src={product.images[selectedImage]}
-                  fit="cover"
-                  align="center"
-                  w="100%"
-                  h={{ base: '100%', sm: '400px', lg: '500px' }}
-                  mb={4}
-                />
+                <Box position="relative" w="100%" h={{ base: '100%', sm: '400px', lg: '500px' }} mb={4}>
+                  {product.images && product.images.length > 0 && (
+                    <NextImage
+                      src={product.images[selectedImage] || '/images/placeholder.jpg'}
+                      alt={product.name}
+                      fill
+                      style={{ 
+                        objectFit: 'cover',
+                        borderRadius: '0.375rem' // equivalent to rounded="md"
+                      }}
+                      priority
+                    />
+                  )}
+                </Box>
                 <Flex justifyContent="center" mt={2}>
-                  {product.images.map((image: string, i: number) => (
+                  {product.images && product.images.map((image: string, i: number) => (
                     <Box
                       key={i}
                       border={i === selectedImage ? '2px solid' : '1px solid'}
-                      borderColor={i === selectedImage ? 'brand.500' : colorMode === 'dark' ? 'gray.600' : 'gray.200'}
+                      borderColor={i === selectedImage ? 'brand.500' : borderColor}
                       rounded="md"
                       mx={1}
                       cursor="pointer"
                       onClick={() => setSelectedImage(i)}
                       overflow="hidden"
+                      position="relative"
+                      w="60px"
+                      h="60px"
                     >
-                      <Image
-                        src={image}
+                      <NextImage
+                        src={image || '/images/placeholder.jpg'}
                         alt={`${product.name} ${i + 1}`}
-                        h="60px"
-                        w="60px"
-                        objectFit="cover"
+                        fill
+                        style={{ objectFit: 'cover' }}
                       />
                     </Box>
                   ))}
@@ -263,7 +289,7 @@ export default function ProductDetail() {
               <Stack p={6}>
                 <Box>
                   <Flex justifyContent="space-between" alignItems="center">
-                    <Heading as="h1" fontSize="3xl" fontWeight="bold">
+                    <Heading as="h1" fontSize="3xl" fontWeight="bold" color={headingColor}>
                       {product.name}
                     </Heading>
                     <Button
@@ -274,7 +300,7 @@ export default function ProductDetail() {
                       {isFavorite ? <FaHeart size={20} /> : <FaRegHeart size={20} />}
                     </Button>
                   </Flex>
-                  <Text color={colorMode === 'dark' ? 'gray.300' : 'gray.500'} fontSize="md">
+                  <Text color={textColor} fontSize="md">
                     By {product.merchant}
                   </Text>
                 </Box>
@@ -283,7 +309,7 @@ export default function ProductDetail() {
                   <Badge colorScheme="green" fontSize="md" px={2} py={1}>
                     {product.rating} ★
                   </Badge>
-                  <Text ml={2} color={colorMode === 'dark' ? 'gray.300' : 'gray.600'}>
+                  <Text ml={2} color={lightTextColor}>
                     ({product.reviewCount} reviews)
                   </Text>
                   {product.featured && (
@@ -294,15 +320,15 @@ export default function ProductDetail() {
                 </Flex>
 
                 <Box>
-                  <Text color={colorMode === 'dark' ? 'white' : 'gray.900'} fontWeight="bold" fontSize="3xl">
+                  <Text color={headingColor} fontWeight="bold" fontSize="3xl">
                     ${product.price}
                   </Text>
-                  <Text color={colorMode === 'dark' ? 'gray.300' : 'gray.600'} fontSize="sm">
+                  <Text color={lightTextColor} fontSize="sm">
                     Import tax and duties included
                   </Text>
                 </Box>
 
-                <Text color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>
+                <Text color={textColor}>
                   {product.description}
                 </Text>
 
@@ -336,13 +362,13 @@ export default function ProductDetail() {
                     w="full"
                     size="lg"
                     py={7}
-                    bg={colorMode === 'dark' ? 'gray.600' : 'gray.100'}
-                    color={colorMode === 'dark' ? 'white' : 'gray.800'}
+                    bg={preOrderBgColor}
+                    color={preOrderColor}
                     textTransform="uppercase"
                     _hover={{
                       transform: 'translateY(2px)',
                       boxShadow: 'lg',
-                      bg: colorMode === 'dark' ? 'gray.500' : 'gray.200',
+                      bg: preOrderHoverBgColor,
                     }}
                     as="a"
                     href="/pre-order"
@@ -353,66 +379,95 @@ export default function ProductDetail() {
 
                 <Stack direction="row" alignItems="center" mt={2}>
                   <MdLocalShipping size={24} />
-                  <Text color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>
+                  <Text color={lightTextColor}>
                     Ships from {product.origin} • {product.shippingEstimate}
                   </Text>
                 </Stack>
 
-                <Tabs>
-                  <TabsList>
-                    <TabsTrigger value="features">Features</TabsTrigger>
-                    <TabsTrigger value="specifications">Specifications</TabsTrigger>
-                    <TabsTrigger value="shipping">Shipping</TabsTrigger>
-                  </TabsList>
+                <Tabs variant="enclosed" colorScheme="brand">
+                  <TabList mb="1em" borderColor={tabBorderColor}>
+                    <Tab 
+                      _selected={{ 
+                        color: tabSelectedColor, 
+                        borderColor: tabBorderColor, 
+                        borderBottomColor: bgColor 
+                      }}
+                      _hover={{ bg: tabHoverColor }}
+                    >
+                      Features
+                    </Tab>
+                    <Tab 
+                      _selected={{ 
+                        color: tabSelectedColor, 
+                        borderColor: tabBorderColor, 
+                        borderBottomColor: bgColor 
+                      }}
+                      _hover={{ bg: tabHoverColor }}
+                    >
+                      Specifications
+                    </Tab>
+                    <Tab 
+                      _selected={{ 
+                        color: tabSelectedColor, 
+                        borderColor: tabBorderColor, 
+                        borderBottomColor: bgColor 
+                      }}
+                      _hover={{ bg: tabHoverColor }}
+                    >
+                      Shipping
+                    </Tab>
+                  </TabList>
 
-                  <TabsContent value="features">
-                    <List>
-                      {product.features.map((feature: string, index: number) => (
-                        <ListItem key={index} color={colorMode === 'dark' ? 'gray.300' : 'gray.700'} mb={2}>
-                          <Text as="span" fontWeight="bold">•</Text> {feature}
-                        </ListItem>
-                      ))}
-                    </List>
-                  </TabsContent>
-                  <TabsContent value="specifications">
-                    <VStack align="stretch">
-                      {Object.entries(product.specifications).map(
-                        ([key, value]: [string, string], index: number) => (
-                          <Box key={index}>
-                            <Flex justifyContent="space-between">
-                              <Text fontWeight="bold" color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>{key}</Text>
-                              <Text color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>{value}</Text>
-                            </Flex>
-                            {index < Object.entries(product.specifications).length - 1 && (
-                              <Divider my={2} borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'} />
-                            )}
-                          </Box>
-                        )
-                      )}
-                    </VStack>
-                  </TabsContent>
-                  <TabsContent value="shipping">
-                    <VStack align="start">
-                      <Box>
-                        <Heading size="sm" color={colorMode === 'dark' ? 'white' : 'gray.900'}>Shipping Information</Heading>
-                        <Text mt={2} color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>
-                          We ship this product directly from {product.origin}. Estimated delivery time is {product.shippingEstimate} after order confirmation.
-                        </Text>
-                      </Box>
-                      <Box>
-                        <Heading size="sm" color={colorMode === 'dark' ? 'white' : 'gray.900'}>Import Duties & Taxes</Heading>
-                        <Text mt={2} color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>
-                          All import duties and taxes are included in the product price. You won&apos;t have to pay any additional fees upon delivery.
-                        </Text>
-                      </Box>
-                      <Box>
-                        <Heading size="sm" color={colorMode === 'dark' ? 'white' : 'gray.900'}>Returns & Exchanges</Heading>
-                        <Text mt={2} color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>
-                          If you&apos;re not completely satisfied with your purchase, you can return it within 30 days for a full refund or exchange.
-                        </Text>
-                      </Box>
-                    </VStack>
-                  </TabsContent>
+                  <TabPanels>
+                    <TabPanel>
+                      <List>
+                        {product.features.map((feature: string, index: number) => (
+                          <ListItem key={index} color={lightTextColor} mb={2}>
+                            <Text as="span" fontWeight="bold">•</Text> {feature}
+                          </ListItem>
+                        ))}
+                      </List>
+                    </TabPanel>
+                    <TabPanel>
+                      <VStack align="stretch">
+                        {Object.entries(product.specifications).map(
+                          ([key, value]: [string, string], index: number) => (
+                            <Box key={index}>
+                              <Flex justifyContent="space-between">
+                                <Text fontWeight="bold" color={lightTextColor}>{key}</Text>
+                                <Text color={lightTextColor}>{value}</Text>
+                              </Flex>
+                              {index < Object.entries(product.specifications).length - 1 && (
+                                <Divider my={2} borderColor={borderColor} />
+                              )}
+                            </Box>
+                          )
+                        )}
+                      </VStack>
+                    </TabPanel>
+                    <TabPanel>
+                      <VStack align="start">
+                        <Box>
+                          <Heading size="sm" color={headingColor}>Shipping Information</Heading>
+                          <Text mt={2} color={lightTextColor}>
+                            We ship this product directly from {product.origin}. Estimated delivery time is {product.shippingEstimate} after order confirmation.
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Heading size="sm" color={headingColor}>Import Duties & Taxes</Heading>
+                          <Text mt={2} color={lightTextColor}>
+                            All import duties and taxes are included in the product price. You won&apos;t have to pay any additional fees upon delivery.
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Heading size="sm" color={headingColor}>Returns & Exchanges</Heading>
+                          <Text mt={2} color={lightTextColor}>
+                            If you&apos;re not completely satisfied with your purchase, you can return it within 30 days for a full refund or exchange.
+                          </Text>
+                        </Box>
+                      </VStack>
+                    </TabPanel>
+                  </TabPanels>
                 </Tabs>
               </Stack>
             </SimpleGrid>
