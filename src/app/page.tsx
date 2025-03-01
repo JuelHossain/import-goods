@@ -100,7 +100,7 @@ export default function Home() {
             {featuredProducts.map((product) => (
               <Box
                 key={product.id}
-                bg="white"
+                bg={useColorModeValue('white', 'gray.700')}
                 boxShadow={'md'}
                 rounded={'md'}
                 overflow={'hidden'}
@@ -119,13 +119,13 @@ export default function Home() {
                     <Heading fontSize={'xl'} fontWeight={500} fontFamily={'body'}>
                       {product.name}
                     </Heading>
-                    <Text color={'gray.500'}>{product.merchant}</Text>
+                    <Text color={useColorModeValue('gray.500', 'gray.300')}>{product.merchant}</Text>
                   </Stack>
 
                   <Stack direction={'row'} justify={'center'} spacing={6}>
                     <Stack spacing={0} align={'center'}>
                       <Text fontWeight={600}>${product.price}</Text>
-                      <Text fontSize={'sm'} color={'gray.500'}>
+                      <Text fontSize={'sm'} color={useColorModeValue('gray.500', 'gray.300')}>
                         {product.category}
                       </Text>
                     </Stack>
@@ -154,18 +154,25 @@ export default function Home() {
       </Box>
 
       {/* How It Works Section */}
-      <Box bg="gray.50" py={16}>
+      <Box bg={useColorModeValue('gray.50', 'gray.900')} py={16}>
         <Container maxW={'6xl'}>
           <Stack spacing={4} as={Container} maxW={'3xl'} textAlign={'center'} mb={12}>
             <Heading fontSize={'3xl'}>How It Works</Heading>
-            <Text color={'gray.600'} fontSize={'xl'}>
+            <Text color={useColorModeValue('gray.600', 'gray.300')} fontSize={'xl'}>
               Our simple process makes importing goods easy and accessible for everyone.
             </Text>
           </Stack>
 
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
             {steps.map((step) => (
-              <Box key={step.id} p={5} shadow={'md'} borderWidth={'1px'} bg="white" rounded="md">
+              <Box 
+                key={step.id} 
+                p={5} 
+                shadow={'md'} 
+                borderWidth={'1px'} 
+                bg={useColorModeValue('white', 'gray.700')} 
+                rounded="md"
+              >
                 <Flex
                   w={16}
                   h={16}
@@ -178,7 +185,7 @@ export default function Home() {
                   {step.icon}
                 </Flex>
                 <Heading fontSize={'xl'} mb={2}>{step.title}</Heading>
-                <Text color={'gray.600'}>{step.text}</Text>
+                <Text color={useColorModeValue('gray.600', 'gray.300')}>{step.text}</Text>
               </Box>
             ))}
           </SimpleGrid>
@@ -186,7 +193,7 @@ export default function Home() {
       </Box>
 
       {/* Call to Action */}
-      <Box bg="brand.500" color="white" py={16}>
+      <Box bg={useColorModeValue('brand.500', 'brand.600')} color="white" py={16}>
         <Container maxW={'3xl'} textAlign={'center'}>
           <Heading mb={4}>Ready to start importing?</Heading>
           <Text fontSize={'xl'} mb={6}>

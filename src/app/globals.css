@@ -2,22 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-@theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-/* Remove default CSS variables that might conflict with Chakra UI */
-/* Chakra UI will handle both light and dark modes through its theming system */
+/* Basic font family definitions */
 body {
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+  font-family: var(--font-inter, Arial, Helvetica, sans-serif);
 }
 
-/* Additional dark mode optimizations */
+/* Dark mode selection styles */
 .chakra-ui-dark ::selection {
   background-color: rgba(77, 193, 255, 0.4);
 }
 
 .chakra-ui-light ::selection {
-  background-color: rgba(14, 165, 233, 0.2);
+  background-color: rgba(0, 120, 212, 0.2);
 }
