@@ -167,8 +167,15 @@ export default function AdminDashboard() {
     const checkAuth = async () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       // In a real app, you would check if the user is authenticated and has admin role
-      setIsAuthenticated(true);
+      // Setting to false by default for security - you should use your real auth logic here
+      setIsAuthenticated(false);
       setIsLoading(false);
+      // Redirect if not authenticated after a short delay
+      if (!isAuthenticated) {
+        setTimeout(() => {
+          router.push('/auth/signin?redirect=/admin');
+        }, 1500);
+      }
     };
 
     checkAuth();
