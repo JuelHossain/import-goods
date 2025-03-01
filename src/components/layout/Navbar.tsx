@@ -382,12 +382,4 @@ const NAV_ITEMS: Array<NavItem> = [
     label: 'Admin',
     href: '/admin',
   },
-  {
-    label: 'About',
-    href: '#',
-  },
-  {
-    label: 'Contact',
-    href: '/contact',
-  },
 ];
