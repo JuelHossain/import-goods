@@ -11,30 +11,36 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      // Get the code and next parameters from the URL
-      const code = searchParams.get('code');
-      const next = searchParams.get('next') || '/';
+      try {
+        // Get the code and next parameters from the URL
+        const code = searchParams.get('code');
+        const next = searchParams.get('next') || '/';
 
-      if (code) {
-        try {
-          // Exchange the code for a session
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          
-          if (error) {
-            console.error('Error exchanging code for session:', error);
+        if (code && supabase) {
+          try {
+            // Exchange the code for a session
+            const { error } = await supabase.auth.exchangeCodeForSession(code);
+            
+            if (error) {
+              console.error('Error exchanging code for session:', error);
+              router.push('/auth/signin?error=Authentication%20failed');
+              return;
+            }
+            
+            // Redirect to the next URL or home page
+            router.push(next);
+          } catch (error) {
+            console.error('Error during auth callback:', error);
             router.push('/auth/signin?error=Authentication%20failed');
-            return;
           }
-          
-          // Redirect to the next URL or home page
-          router.push(next);
-        } catch (error) {
-          console.error('Error during auth callback:', error);
-          router.push('/auth/signin?error=Authentication%20failed');
+        } else {
+          // For static site generation or if Supabase is not configured
+          console.log('Mock auth or missing Supabase client, redirecting to home');
+          router.push('/');
         }
-      } else {
-        // If there's no code, redirect to sign in
-        router.push('/auth/signin');
+      } catch (error) {
+        console.error('General error in auth callback:', error);
+        router.push('/');
       }
     };
 

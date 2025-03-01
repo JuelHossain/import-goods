@@ -159,51 +159,51 @@ export default function Dashboard() {
   // Table columns for recent orders
   const orderColumns = [
     {
+      key: 'id',
       header: 'Order ID',
-      accessor: 'id',
     },
     {
+      key: 'customer',
       header: 'Customer',
-      accessor: 'customer',
     },
     {
+      key: 'date',
       header: 'Date',
-      accessor: 'date',
     },
     {
+      key: 'amount',
       header: 'Amount',
-      accessor: 'amount',
-      cell: (value: number) => formatPrice(value),
+      render: (item) => formatPrice(item.amount),
     },
     {
+      key: 'status',
       header: 'Status',
-      accessor: 'status',
-      cell: (value: string) => getStatusBadge(value),
+      render: (item) => getStatusBadge(item.status),
     },
   ];
 
   // Table columns for top products
   const productColumns = [
     {
+      key: 'name',
       header: 'Product',
-      accessor: 'name',
     },
     {
+      key: 'category',
       header: 'Category',
-      accessor: 'category',
     },
     {
+      key: 'price',
       header: 'Price',
-      accessor: 'price',
-      cell: (value: number) => formatPrice(value),
+      render: (item) => formatPrice(item.price),
     },
     {
+      key: 'stock',
       header: 'Stock',
-      accessor: 'stock',
     },
     {
+      key: 'sales',
       header: 'Sales',
-      accessor: 'sales',
     },
   ];
 

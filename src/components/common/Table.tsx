@@ -25,7 +25,12 @@ export interface TableColumn<T = any> {
   /**
    * Unique key for the column
    */
-  key: string;
+  key?: string;
+  
+  /**
+   * Alternative to key, accessor field name
+   */
+  accessor?: string;
   
   /**
    * Header text for the column
@@ -36,6 +41,11 @@ export interface TableColumn<T = any> {
    * Function to render the cell content
    */
   render?: (item: T, index: number) => ReactNode;
+  
+  /**
+   * Alternative to render, cell renderer
+   */
+  cell?: (value: any) => ReactNode;
   
   /**
    * Width of the column
@@ -116,7 +126,7 @@ export function Table<T = any>({
             <Tr>
               {columns.map((column) => (
                 <Th 
-                  key={column.key}
+                  key={column.key || column.accessor}
                   width={column.width}
                   color={colors.textSecondary}
                 >
@@ -145,8 +155,12 @@ export function Table<T = any>({
               data.map((item, index) => (
                 <Tr key={index}>
                   {columns.map((column) => (
-                    <Td key={`${index}-${column.key}`}>
-                      {column.render ? column.render(item, index) : (item as any)[column.key]}
+                    <Td key={`${index}-${column.key || column.accessor}`}>
+                      {column.render 
+                        ? column.render(item, index) 
+                        : column.cell 
+                          ? column.cell((item as any)[column.key || column.accessor as string])
+                          : (item as any)[column.key || column.accessor as string]}
                     </Td>
                   ))}
                 </Tr>

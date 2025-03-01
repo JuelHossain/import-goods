@@ -64,7 +64,7 @@ export default function ResetPassword() {
     
     setIsLoading(true);
     try {
-      const { error } = await updatePassword(data.password, token);
+      const { error } = await updatePassword(data.password);
       
       if (error) throw error;
       

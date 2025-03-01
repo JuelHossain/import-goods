@@ -1,13 +1,12 @@
-import ProductDetailClient from './client';
-import { mockProducts } from '@/data/mock/products';
+import ProductDetailClient, { products } from './ProductDetailClient';
 
 /**
  * Generate static paths for all product IDs
  */
 export function generateStaticParams() {
   // Return an array of objects with the id parameter
-  return mockProducts.map((product) => ({
-    id: product.id.toString(),
+  return products.map((product) => ({
+    id: product.id,
   }));
 }
 

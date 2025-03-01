@@ -72,14 +72,14 @@ export default function AnalyticsDashboard() {
               <Box
                 w="100%"
                 h="8px"
-                bg={colors.bgHover}
+                bg={colors.hoverBg}
                 borderRadius="full"
                 overflow="hidden"
               >
                 <Box
                   h="100%"
                   w={`${category.percentage}%`}
-                  bg={colors.primary}
+                  bg={colors.bgPrimary}
                   borderRadius="full"
                 />
               </Box>
@@ -105,14 +105,14 @@ export default function AnalyticsDashboard() {
               <Box
                 w="100%"
                 h="8px"
-                bg={colors.bgHover}
+                bg={colors.hoverBg}
                 borderRadius="full"
                 overflow="hidden"
               >
                 <Box
                   h="100%"
                   w={`${country.percentage}%`}
-                  bg={colors.primary}
+                  bg={colors.bgPrimary}
                   borderRadius="full"
                 />
               </Box>
@@ -165,7 +165,7 @@ export default function AnalyticsDashboard() {
               defaultValue="last30days"
               w={{ base: 'full', md: '200px' }}
               bg={colors.inputBg}
-              borderColor={colors.borderColor}
+              borderColor={colors.borderPrimary}
             >
               <option value="today">Today</option>
               <option value="yesterday">Yesterday</option>
@@ -197,7 +197,7 @@ export default function AnalyticsDashboard() {
           <Flex
             p={4}
             borderBottomWidth="1px"
-            borderBottomColor={colors.borderColor}
+            borderBottomColor={colors.borderPrimary}
             justifyContent="space-between"
             alignItems="center"
           >
@@ -209,7 +209,7 @@ export default function AnalyticsDashboard() {
               w="150px"
               size="sm"
               bg={colors.inputBg}
-              borderColor={colors.borderColor}
+              borderColor={colors.borderPrimary}
             >
               <option value="thisYear">This Year</option>
               <option value="lastYear">Last Year</option>
@@ -230,12 +230,12 @@ export default function AnalyticsDashboard() {
                 >
                   <Box
                     w="70%"
-                    bg={colors.primary}
+                    bg={colors.bgPrimary}
                     h={`${(item.revenue / 124500) * 100}%`}
                     borderRadius="sm"
                     transition="height 0.3s"
                     _hover={{
-                      bg: colors.primaryHover,
+                      bg: colors.hoverBg,
                     }}
                   />
                   <Text fontSize="xs" mt={2} color={colors.textSecondary}>
@@ -253,7 +253,7 @@ export default function AnalyticsDashboard() {
             <Flex
               p={4}
               borderBottomWidth="1px"
-              borderBottomColor={colors.borderColor}
+              borderBottomColor={colors.borderPrimary}
               justifyContent="space-between"
               alignItems="center"
             >
@@ -270,7 +270,7 @@ export default function AnalyticsDashboard() {
             <Flex
               p={4}
               borderBottomWidth="1px"
-              borderBottomColor={colors.borderColor}
+              borderBottomColor={colors.borderPrimary}
               justifyContent="space-between"
               alignItems="center"
             >

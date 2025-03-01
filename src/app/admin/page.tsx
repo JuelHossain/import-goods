@@ -301,7 +301,7 @@ export default function AdminDashboard() {
 
                 <Box overflowX="auto">
                   <TableContainer>
-                    <Table width="100%" borderCollapse="collapse">
+                    <Table>
                       <Thead>
                         <Tr>
                           <Th textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={useColorModeValue("gray.200", "gray.700")}>Order ID</Th>
@@ -382,7 +382,7 @@ export default function AdminDashboard() {
 
                 <Box overflowX="auto">
                   <TableContainer>
-                    <Table width="100%" borderCollapse="collapse">
+                    <Table>
                       <Thead>
                         <Tr>
                           <Th textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={useColorModeValue("gray.200", "gray.700")}>Pre-Order ID</Th>
@@ -470,7 +470,7 @@ export default function AdminDashboard() {
 
                 <Box overflowX="auto">
                   <TableContainer>
-                    <Table width="100%" borderCollapse="collapse">
+                    <Table>
                       <Thead>
                         <Tr>
                           <Th textAlign="left" py={3} px={4} borderBottom="1px solid" borderColor={useColorModeValue("gray.200", "gray.700")}>Product ID</Th>
@@ -489,7 +489,7 @@ export default function AdminDashboard() {
                               (selectedCategory === 'all' ||
                               product.category.toLowerCase().includes(selectedCategory.toLowerCase())) &&
                               (searchQuery === '' ||
-                              product.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              String(product.id).toLowerCase().includes(searchQuery.toLowerCase()) ||
                               product.name.toLowerCase().includes(searchQuery.toLowerCase()))
                           )
                           .map(product => (
