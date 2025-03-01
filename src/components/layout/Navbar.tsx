@@ -379,15 +379,15 @@ const NAV_ITEMS: Array<NavItem> = [
     href: '/pre-order',
   },
   {
+    label: 'Admin',
+    href: '/admin',
+  },
+  {
     label: 'About',
     href: '#',
   },
   {
     label: 'Contact',
-    href: '#',
-  },
-  {
-    label: 'Admin',
-    href: '/admin',
+    href: '/contact',
   },
 ];
