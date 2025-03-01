@@ -38,7 +38,7 @@ export default function Home() {
           </Heading>
           <Text color={'gray.500'}>
             We connect you with the finest products from global merchants. 
-            Whether you're looking for unique items or bulk orders, 
+            Whether you&apos;re looking for unique items or bulk orders, 
             our export business makes international trade simple and accessible.
           </Text>
           <Stack

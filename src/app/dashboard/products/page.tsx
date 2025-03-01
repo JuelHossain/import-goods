@@ -7,19 +7,19 @@ import {
   Heading,
   Button,
   HStack,
-  InputGroup,
   Input,
-  InputRightElement,
   IconButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
+  Menu as ChakraMenu,
+  MenuButton as ChakraMenuButton,
+  MenuList as ChakraMenuList,
+  MenuItem as ChakraMenuItem,
   SimpleGrid,
   Text,
   Image,
   VStack,
   useDisclosure,
+  InputGroup,
+  InputRightElement,
 } from '@chakra-ui/react';
 import { SearchIcon, AddIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { FiGrid, FiList } from 'react-icons/fi';
@@ -180,7 +180,7 @@ export default function ProductsDashboard() {
     {
       header: 'Actions',
       accessor: 'id',
-      cell: (_: string) => (
+      cell: () => (
         <HStack spacing={2}>
           <Button size="sm" variant="ghost">Edit</Button>
           <Button size="sm" variant="ghost" colorScheme="red">Delete</Button>
@@ -227,40 +227,40 @@ export default function ProductsDashboard() {
           </InputGroup>
 
           <HStack spacing={4}>
-            <Menu>
-              <MenuButton
+            <ChakraMenu>
+              <ChakraMenuButton
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
                 variant="outline"
                 size="md"
               >
                 Category
-              </MenuButton>
-              <MenuList>
-                <MenuItem>All Categories</MenuItem>
-                <MenuItem>Furniture</MenuItem>
-                <MenuItem>Home Decor</MenuItem>
-                <MenuItem>Bedding</MenuItem>
-                <MenuItem>Kitchen</MenuItem>
-              </MenuList>
-            </Menu>
+              </ChakraMenuButton>
+              <ChakraMenuList>
+                <ChakraMenuItem>All Categories</ChakraMenuItem>
+                <ChakraMenuItem>Furniture</ChakraMenuItem>
+                <ChakraMenuItem>Home Decor</ChakraMenuItem>
+                <ChakraMenuItem>Bedding</ChakraMenuItem>
+                <ChakraMenuItem>Kitchen</ChakraMenuItem>
+              </ChakraMenuList>
+            </ChakraMenu>
 
-            <Menu>
-              <MenuButton
+            <ChakraMenu>
+              <ChakraMenuButton
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
                 variant="outline"
                 size="md"
               >
                 Status
-              </MenuButton>
-              <MenuList>
-                <MenuItem>All Status</MenuItem>
-                <MenuItem>Active</MenuItem>
-                <MenuItem>Low Stock</MenuItem>
-                <MenuItem>Out of Stock</MenuItem>
-              </MenuList>
-            </Menu>
+              </ChakraMenuButton>
+              <ChakraMenuList>
+                <ChakraMenuItem>All Status</ChakraMenuItem>
+                <ChakraMenuItem>Active</ChakraMenuItem>
+                <ChakraMenuItem>Low Stock</ChakraMenuItem>
+                <ChakraMenuItem>Out of Stock</ChakraMenuItem>
+              </ChakraMenuList>
+            </ChakraMenu>
 
             <HStack spacing={2} display={{ base: 'none', md: 'flex' }}>
               <IconButton

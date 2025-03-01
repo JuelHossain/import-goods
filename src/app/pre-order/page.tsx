@@ -19,7 +19,6 @@ import {
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import MainLayout from '@/components/layout/MainLayout';
-import { supabase } from '@/lib/supabase';
 
 type PreOrderFormData = {
   name: string;
@@ -40,17 +39,17 @@ export default function PreOrderPage() {
     formState: { errors },
   } = useForm<PreOrderFormData>();
 
-  const onSubmit = async (data: PreOrderFormData) => {
+  const onSubmit = async (formData: PreOrderFormData) => {
     setIsSubmitting(true);
     try {
       // In a real app, you would use Supabase to store the pre-order
       // const { error } = await supabase.from('pre_orders').insert({
-      //   name: data.name,
-      //   email: data.email,
-      //   phone: data.phone,
-      //   shipping_address: data.shippingAddress,
-      //   product_link: data.productLink,
-      //   notes: data.notes,
+      //   name: formData.name,
+      //   email: formData.email,
+      //   phone: formData.phone,
+      //   shipping_address: formData.shippingAddress,
+      //   product_link: formData.productLink,
+      //   notes: formData.notes,
       //   status: 'pending',
       // });
       
@@ -60,8 +59,8 @@ export default function PreOrderPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
-        title: 'Pre-order submitted.',
-        description: "We've received your pre-order request and will contact you soon.",
+        title: 'Pre-order submitted!',
+        description: `Thank you ${formData.name}, we'll contact you soon about your request.`,
         status: 'success',
         duration: 5000,
         isClosable: true,
