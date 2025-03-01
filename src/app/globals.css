@@ -7,20 +7,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Remove default CSS variables that might conflict with Chakra UI */
+/* Chakra UI will handle both light and dark modes through its theming system */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+}
+
+/* Additional dark mode optimizations */
+.chakra-ui-dark ::selection {
+  background-color: rgba(77, 193, 255, 0.4);
+}
+
+.chakra-ui-light ::selection {
+  background-color: rgba(14, 165, 233, 0.2);
 }

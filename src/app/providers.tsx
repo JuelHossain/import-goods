@@ -24,12 +24,17 @@ const theme = extendTheme({
     heading: 'var(--font-inter)',
     body: 'var(--font-inter)',
   },
+  config: {
+    initialColorMode: 'system',
+    useSystemColorMode: true,
+  },
   styles: {
-    global: {
+    global: (props) => ({
       body: {
-        bg: 'gray.50',
+        bg: props.colorMode === 'dark' ? 'gray.800' : 'gray.50',
+        color: props.colorMode === 'dark' ? 'white' : 'gray.800',
       },
-    },
+    }),
   },
   components: {
     Button: {
@@ -45,11 +50,17 @@ const theme = extendTheme({
             bg: 'brand.600',
           },
         },
-        outline: {
+        outline: (props) => ({
           borderColor: 'brand.500',
-          color: 'brand.500',
-        },
+          color: props.colorMode === 'dark' ? 'brand.200' : 'brand.500',
+        }),
       },
+    },
+    Card: {
+      baseStyle: (props) => ({
+        bg: props.colorMode === 'dark' ? 'gray.700' : 'white',
+        boxShadow: props.colorMode === 'dark' ? 'dark-lg' : 'md',
+      }),
     },
   },
 });
