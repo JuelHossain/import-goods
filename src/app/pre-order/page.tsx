@@ -16,10 +16,16 @@ import {
   FormErrorMessage,
   Divider,
   useColorModeValue,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+  Flex,
+  FormHelperText,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import MainLayout from '@/components/layout/MainLayout';
+import { FiDollarSign, FiPercent, FiPaperclip } from 'react-icons/fi';
 
 type PreOrderFormData = {
   name: string;
@@ -28,11 +34,16 @@ type PreOrderFormData = {
   shippingAddress: string;
   productLink: string;
   notes: string;
+  price: string;
+  discountCoupon: string;
+  productImage?: FileList;
 };
 
 export default function PreOrderPage() {
   const toast = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState<string>('');
   const {
     handleSubmit,
     register,
@@ -51,6 +62,10 @@ export default function PreOrderPage() {
       //   shipping_address: formData.shippingAddress,
       //   product_link: formData.productLink,
       //   notes: formData.notes,
+      //   price: formData.price,
+      //   discount_coupon: formData.discountCoupon,
+      //   // You would upload the image to storage and save the URL
+      //   // image_url: uploadedImageUrl,
       //   status: 'pending',
       // });
       
@@ -68,6 +83,7 @@ export default function PreOrderPage() {
       });
       
       reset();
+      setSelectedFileName('');
     } catch (error) {
       console.error('Error submitting pre-order:', error);
       toast({
@@ -79,6 +95,12 @@ export default function PreOrderPage() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFileName(e.target.files[0].name);
     }
   };
 
@@ -195,6 +217,83 @@ export default function PreOrderPage() {
                     }}
                   />
                   <FormErrorMessage>{errors.productLink?.message}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl isInvalid={!!errors.price} isRequired>
+                  <FormLabel color={useColorModeValue('gray.700', 'gray.200')}>Expected Price</FormLabel>
+                  <InputGroup>
+                    <InputLeftElement
+                      pointerEvents='none'
+                      color={useColorModeValue('gray.500', 'gray.400')}
+                      children={<FiDollarSign />}
+                    />
+                    <Input 
+                      {...register('price', {
+                        required: 'Price is required',
+                        pattern: {
+                          value: /^[0-9]+(\.[0-9]{1,2})?$/,
+                          message: 'Please enter a valid price'
+                        }
+                      })}
+                      placeholder="0.00"
+                      type="text"
+                      bg={useColorModeValue('white', 'gray.800')}
+                      borderColor={useColorModeValue('gray.300', 'gray.600')}
+                      _hover={{
+                        borderColor: useColorModeValue('gray.400', 'gray.500')
+                      }}
+                    />
+                  </InputGroup>
+                  <FormHelperText>Enter the expected price for this product</FormHelperText>
+                  <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl isInvalid={!!errors.discountCoupon}>
+                  <FormLabel color={useColorModeValue('gray.700', 'gray.200')}>Discount Coupon</FormLabel>
+                  <Input 
+                    {...register('discountCoupon')}
+                    placeholder="Enter coupon code"
+                    type="text"
+                    bg={useColorModeValue('white', 'gray.800')}
+                    borderColor={useColorModeValue('gray.300', 'gray.600')}
+                    _hover={{
+                      borderColor: useColorModeValue('gray.400', 'gray.500')
+                    }}
+                  />
+                  <FormHelperText>Enter any discount coupon code you have (optional)</FormHelperText>
+                  <FormErrorMessage>{errors.discountCoupon?.message}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel color={useColorModeValue('gray.700', 'gray.200')}>Product Image</FormLabel>
+                  <Flex direction="column" gap={2}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      {...register('productImage')}
+                      style={{ display: 'none' }}
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                    <Button 
+                      onClick={() => fileInputRef.current?.click()}
+                      leftIcon={<FiPaperclip />}
+                      variant="outline"
+                      colorScheme="blue"
+                      borderColor={useColorModeValue('gray.300', 'gray.600')}
+                      _hover={{
+                        borderColor: useColorModeValue('gray.400', 'gray.500')
+                      }}
+                    >
+                      Browse Files
+                    </Button>
+                    {selectedFileName && (
+                      <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')}>
+                        Selected file: {selectedFileName}
+                      </Text>
+                    )}
+                  </Flex>
+                  <FormHelperText>Upload an image of the product (optional)</FormHelperText>
                 </FormControl>
 
                 <FormControl isInvalid={!!errors.notes}>

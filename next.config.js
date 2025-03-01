@@ -13,8 +13,8 @@ const nextConfig = {
   },
   
   // For GitHub Pages deployment
-  basePath: '/import-goods',
-  assetPrefix: '/import-goods/',
+  basePath: process.env.NODE_ENV === 'production' ? '/import-goods' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/import-goods/' : '',
 };
 
 module.exports = nextConfig;
